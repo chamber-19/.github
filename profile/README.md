@@ -1,4 +1,3 @@
-<!-- markdownlint-disable MD013 -->
 # Chamber 19
 
 Engineering software for [Root 3 Power](https://root3power.com), built around AutoCAD and Tauri.
