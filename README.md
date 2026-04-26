@@ -1,11 +1,10 @@
-<!-- markdownlint-disable MD013 -->
 # chamber-19/.github
 
 This repository holds the Chamber 19 organization's shared configuration and landing page assets.
 
 ## What lives here
 
-- `profile/README.md` — the landing page rendered at <https://github.com/chamber-19>
+- `profile/README.md` — the landing page rendered at https://github.com/chamber-19
 - `.github/copilot-instructions.md` — family-wide GitHub Copilot guidance inherited by every repo in the org
 - `.github/CONTRIBUTING.md`, `.github/SECURITY.md`, `.github/SUPPORT.md` (future) — fallback templates for repos that don't define their own
 
