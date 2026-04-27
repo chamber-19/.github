@@ -19,14 +19,12 @@ This repo is part of the **Chamber 19 tool family**, a coordinated set of engine
 | Repo | Role | Language / stack |
 | --- | --- | --- |
 | `chamber-19/desktop-toolkit` | Shared framework for Tauri desktop apps (splash, updater, NSIS installer, Python sidecar plumbing) | Rust + JS + Python + NSIS |
-| `chamber-19/autocad-pipeline` | Shared MSBuild props + csproj template for AutoCAD .NET plugins | MSBuild XML only |
-| `chamber-19/object-totaler` | AutoCAD plugin: `TOTAL` and `TOTALSIM` commands for curve length totaling | C# / .NET, consumes `autocad-pipeline` |
 | `chamber-19/launcher` | Tauri shell that installs, updates, and launches Chamber 19 tools | Rust + React, consumes `desktop-toolkit` |
 | `chamber-19/transmittal-builder` | Standalone Tauri app for generating engineering transmittals | Rust + React + Python, consumes `desktop-toolkit` |
 | `chamber-19/Drawing-List-Manager` | Standalone Tauri app for project drawing registers | Rust + React + Python, consumes `desktop-toolkit` |
 | `chamber-19/.github` | Org-shared configuration and landing page | Markdown |
 
-The Tauri consumer apps (`launcher`, `transmittal-builder`, `Drawing-List-Manager`) each pin an explicit `desktop-toolkit` version. A toolkit release does not auto-propagate — bumping the pin in a consumer is a deliberate, reviewable action. The same applies to `object-totaler` consuming `autocad-pipeline`.
+The Tauri consumer apps (`launcher`, `transmittal-builder`, `Drawing-List-Manager`) each pin an explicit `desktop-toolkit` version. A toolkit release does not auto-propagate — bumping the pin in a consumer is a deliberate, reviewable action.
 
 ### Non-goals for this family
 
@@ -38,13 +36,12 @@ The Tauri consumer apps (`launcher`, `transmittal-builder`, `Drawing-List-Manage
 
 Use GitHub Copilot Memory (visible at Repo Settings → Copilot → Memory) to recall and update these as decisions evolve. Current state:
 
-1. **`autocad-pipeline` is deliberately minimal.** v0.1.0 contains only `Directory.Build.props` and a parameterized `Plugin.csproj.template`. No shared C# code. No NuGet packages. No PowerShell scripts. These get added when plugin #2 exists and reveals concrete duplication, not before.
-2. **AutoCAD plugin commands use bare names, no prefix.** `TOTAL`, not `CH19TOTAL`. The Chamber 19 identity lives in package metadata, not in every command typed at the AutoCAD command line.
-3. **Launcher is the installer/updater for AutoCAD plugins.** It does not ship plugin source code. Plugins live in their own repos (e.g. `object-totaler`). Launcher fetches their releases from GitHub and installs the DLL to `%APPDATA%\Chamber19\AutoCAD\`, managing NETLOAD via the user's `acaddoc.lsp`.
-4. **GitHub Releases is the distribution channel, not a network share.** Even for internal use. This keeps engineers on VPN-optional workflows and is ready for external distribution if that ever happens.
-5. **Plugins and the launcher release on independent tags.** Plugin tags follow the form `v0.1.0` within their own repo. Launcher has its own version. A launcher update does not imply a plugin update and vice versa.
-6. **The launcher repo was renamed from `shopvac` to `launcher`.** Old clones need `git remote set-url`. GitHub's redirect handles URLs automatically but don't rely on it in documentation.
-7. **GitHub Packages versions are immutable.** A bad `@chamber-19/desktop-toolkit` release cannot be yanked cleanly. When a toolkit release breaks this repo, fix forward with a new patch version upstream rather than trying to recall the bad one.
+1. **AutoCAD plugin commands use bare names, no prefix.** `TOTAL`, not `CH19TOTAL`. The Chamber 19 identity lives in package metadata, not in every command typed at the AutoCAD command line.
+2. **Launcher is the installer/updater for AutoCAD plugins.** It does not ship plugin source code. Plugins live in their own repos. Launcher fetches their releases from GitHub and installs the DLL to `%APPDATA%\Chamber19\AutoCAD\`, managing NETLOAD via the user's `acaddoc.lsp`.
+3. **GitHub Releases is the distribution channel, not a network share.** Even for internal use. This keeps engineers on VPN-optional workflows and is ready for external distribution if that ever happens.
+4. **Plugins and the launcher release on independent tags.** Plugin tags follow the form `v0.1.0` within their own repo. Launcher has its own version. A launcher update does not imply a plugin update and vice versa.
+5. **The launcher repo was renamed from `shopvac` to `launcher`.** Old clones need `git remote set-url`. GitHub's redirect handles URLs automatically but don't rely on it in documentation.
+6. **GitHub Packages versions are immutable.** A bad `@chamber-19/desktop-toolkit` release cannot be yanked cleanly. When a toolkit release breaks this repo, fix forward with a new patch version upstream rather than trying to recall the bad one.
 
 When making a decision that affects another repo or that future sessions need to respect, persist it to Copilot Memory. Explicit state beats re-derivation every time.
 
@@ -179,8 +176,8 @@ Shared visual language across all Chamber 19 tools:
 
 - All repos use **SemVer** (`vMAJOR.MINOR.PATCH`)
 - Breaking changes require a major version bump and a clearly-marked `### Changed` / `### Removed` section in `CHANGELOG.md`
-- Libraries (`desktop-toolkit`, `autocad-pipeline`) publish immutable version tags — downstream consumers pin exact versions
-- Consumer apps (`launcher`, `object-totaler`, `transmittal-builder`, `Drawing-List-Manager`) can use `^x.y.z` ranges when depending on libraries
+- Libraries (`desktop-toolkit`) publish immutable version tags — downstream consumers pin exact versions
+- Consumer apps (`launcher`, `transmittal-builder`, `Drawing-List-Manager`) can use `^x.y.z` ranges when depending on libraries
 
 ### Tags
 
