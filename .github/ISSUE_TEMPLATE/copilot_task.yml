@@ -1,0 +1,40 @@
+name: Copilot task
+description: Well-scoped task for the Copilot cloud agent
+title: "[Copilot]: "
+labels: ["copilot-task"]
+body:
+  - type: textarea
+    attributes:
+      label: Goal
+      description: What's the user-visible outcome?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Acceptance criteria
+      description: Checkbox list. How do we know it's done?
+      placeholder: |
+        - [ ] X behaves like Y
+        - [ ] Tests pass
+        - [ ] Docs updated if contract changed
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Non-goals
+      description: What's explicitly out of scope? Prevents scope creep.
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Build/test command
+      description: Exact command(s) the agent should run to validate.
+      placeholder: "npm test && cargo check"
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Files likely involved
+      description: Optional. Helps the agent target the right area.
+    validations:
+      required: false

@@ -1,0 +1,48 @@
+name: Bug report
+description: A friction or bug observed during real use
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: textarea
+    attributes:
+      label: What happened
+      description: Observed behavior. Be concrete.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Reproduction steps
+      placeholder: |
+        1. 
+        2. 
+        3. 
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Acceptance criteria (TDD)
+      description: Copilot should write a regression test FIRST that fails on current behavior, then make it pass.
+      value: |
+        - [ ] Regression test added that fails on current main
+        - [ ] Fix makes the test pass
+        - [ ] No unrelated behavior changes
+        - [ ] Existing tests still pass
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Build/test command
+      placeholder: "npm test"
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Environment / context
+      description: OS, app version, relevant data file, etc.
+    validations:
+      required: false
