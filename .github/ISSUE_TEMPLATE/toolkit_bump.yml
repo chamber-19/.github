@@ -1,0 +1,50 @@
+name: desktop-toolkit version bump
+description: Bump the pinned desktop-toolkit version in a consumer repo
+title: "[Toolkit bump]: desktop-toolkit -> v"
+labels: ["copilot-task", "toolkit-bump"]
+body:
+  - type: input
+    attributes:
+      label: Target desktop-toolkit version
+      placeholder: "v2.2.7"
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Current pinned version
+      placeholder: "v2.2.6"
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Acceptance criteria
+      value: |
+        - [ ] Run `/consume-toolkit-bump` prompt to execute the bump procedure
+        - [ ] frontend/package.json pin updated
+        - [ ] frontend/src-tauri/Cargo.toml pin updated
+        - [ ] Lockfiles regenerated (package-lock.json, Cargo.lock)
+        - [ ] `npm test && cargo check` passes
+        - [ ] docs/CONSUMING.md contract still satisfied
+        - [ ] No unrelated behavior changes
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Non-goals
+      value: |
+        - No refactors outside the version pin update
+        - No changes to product behavior
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Build/test command
+      placeholder: "npm test && cargo check"
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Release notes link
+      description: Link to the desktop-toolkit release notes for the target version
+    validations:
+      required: false
