@@ -1,0 +1,13 @@
+name: rust_error_handling
+input: |
+  Write a Rust function annotated with `#[tauri::command]` that reads the
+  contents of a file given its path and returns them as a string.
+must_contain:
+  - "#[tauri::command]"
+  - "Result<"
+  - "std::fs::read_to_string"
+  - "map_err"
+  - "?"
+must_not_contain:
+  - ".unwrap()"
+  - ".expect("

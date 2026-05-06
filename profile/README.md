@@ -1,31 +1,45 @@
 # Chamber 19
 
-Engineering software for [Root 3 Power](https://root3power.com), built around AutoCAD and Tauri.
+Engineering software for [Root 3 Power](https://root3power.com), built
+around AutoCAD and Tauri.
 
 ## Tools
 
 | Repo | Role |
-| --- | --- |
+|---|---|
 | [`desktop-toolkit`](https://github.com/chamber-19/desktop-toolkit) | Shared framework for Tauri desktop apps — splash, updater, NSIS installer, Python sidecar plumbing |
 | [`launcher`](https://github.com/chamber-19/launcher) | Desktop tool shell — installs, updates, and launches Chamber 19 tools |
-| [`transmittal-builder`](https://github.com/chamber-19/transmittal-builder) | Standalone Tauri app for generating engineering transmittals |
+| [`transmittal-builder`](https://github.com/chamber-19/transmittal-builder) | Standalone Tauri app for generating engineering transmittal packages |
 | [`Drawing-List-Manager`](https://github.com/chamber-19/Drawing-List-Manager) | Standalone Tauri app for project drawing registers |
+| [`Foundry`](https://github.com/chamber-19/Foundry) | Local agent broker — routes GitHub and Discord jobs to local LLMs via Ollama |
+| [`autocad-knowledge`](https://github.com/chamber-19/autocad-knowledge) | Reference patterns and knowledge base for AutoCAD .NET plugins |
+| [`IFA-IFC-Checklist`](https://github.com/chamber-19/IFA-IFC-Checklist) | Macro-enabled Excel workbook for IFA and IFC pre-submittal checklists |
+| [`block-library`](https://github.com/chamber-19/block-library) | Web dashboard for managing AutoCAD block libraries |
 
 ## Design system
 
-- **Background:** `#1C1B19` — warm dark
-- **Accent:** `#C4884D` — copper
-- **Body type:** DM Sans
-- **Display type:** Instrument Serif
-- **Mono / data:** JetBrains Mono
+| Token | Value |
+|---|---|
+| Background | `#1C1B19` — warm dark |
+| Accent | `#C4884D` — copper |
+| Success | `#6B9E6B` |
+| Warning | `#C4A24D` |
+| Error | `#B85C5C` |
+| Info | `#5C8EB8` |
+| Body type | DM Sans |
+| Display type | Instrument Serif |
+| Mono / data | JetBrains Mono |
 
-Warm industrial tone. Engineering-grade, not corporate-slick. Short, matter-of-fact copy.
+Warm industrial tone. Engineering-grade, not corporate-slick. Short,
+matter-of-fact copy.
 
 ## Conventions
 
-- All repos use SemVer
+- All repos use SemVer (`vMAJOR.MINOR.PATCH`)
 - GitHub Releases is the distribution channel
 - Plugins and the launcher release on independent tags
-- The `desktop-toolkit` framework is version-pinned by each consumer; bumps are deliberate
+- `desktop-toolkit` is version-pinned by each consumer; bumps are
+  deliberate PRs that update npm and Cargo pins together
 
-See [`.github/copilot-instructions.md`](./.github/copilot-instructions.md) for org-wide Copilot guidance.
+See [`.github/copilot-instructions.md`](./.github/copilot-instructions.md)
+for org-wide Copilot and agent guidance.

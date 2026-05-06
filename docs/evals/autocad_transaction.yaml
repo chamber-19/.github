@@ -1,0 +1,19 @@
+name: autocad_transaction
+input: |
+  Write a C# AutoCAD command that adds a circle with radius 5 at the origin
+  to the current drawing. The command should be named ADDCIRCLE.
+must_contain:
+  - "[CommandMethod(\"ADDCIRCLE\")]"
+  - "StartTransaction()"
+  # Entity must be registered with the transaction after creation
+  - "AddNewlyCreatedDBObject("
+  - "OpenMode.ForRead"
+  - "UpgradeOpen()"
+  - "Commit()"
+  # Circle must be appended to model space
+  - "AppendEntity("
+must_not_contain:
+  - ".unwrap("
+  - "On Error Resume Next"
+  # COM calls inside a .NET plugin are forbidden
+  - "AutoCAD.Application"

@@ -1,0 +1,20 @@
+name: vba_stage_submit
+input: |
+  Write a VBA macro named SubmitStage30 that validates all checklist items
+  on the 30% IFA sheet, prompts the user, saves a timestamped backup copy
+  of the workbook, and marks the stage as submitted.
+must_contain:
+  - "Sub SubmitStage30()"
+  - "On Error GoTo"
+  - "SaveCopyAs"
+  # Backup path must be constructed — any variable name is acceptable
+  - "backupPath"
+  # Status validation must check completion — value or string may vary
+  - "Complete"
+  # User must be prompted before submission
+  - "MsgBox"
+must_not_contain:
+  - "On Error Resume Next"
+  # Must not save over the original workbook — SaveCopyAs is required
+  # Use "ActiveWorkbook.Save " with trailing space to avoid matching SaveCopyAs
+  - "ActiveWorkbook.Save "

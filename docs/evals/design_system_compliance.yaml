@@ -1,0 +1,20 @@
+name: design_system_compliance
+input: |
+  Define CSS custom properties for the Chamber 19 design system used across
+  all web UIs.
+must_contain:
+  - "--color-background: #1C1B19"
+  - "--color-accent: #C4884D"
+  - "--color-success: #6B9E6B"
+  - "--color-warning: #C4A24D"
+  - "--color-error: #B85C5C"
+  - "--color-info: #5C8EB8"
+  - "DM Sans"
+  - "Instrument Serif"
+  - "JetBrains Mono"
+must_not_contain:
+  - "Inter"
+  - "Roboto"
+  - "Arial"
+  - "linear-gradient"
+  - "radial-gradient"
