@@ -1,0 +1,6 @@
+[submodule "docs/skills/tauri2-skills"]
+	path = docs/skills/tauri2-skills
+	url = https://github.com/OpenAEC-Foundation/Tauri-2-Claude-Skill-Package.git
+[submodule "docs/skills/threejs-skills"]
+	path = docs/skills/threejs-skills
+	url = https://github.com/OpenAEC-Foundation/Three.js-Claude-Skill-Package.git
