@@ -1,0 +1,17 @@
+name: python_sidecar_flush
+input: |
+  Create a Python sidecar script that reads lines from STDIN, increments a
+  number until it reaches 10, and prints a JSON object with the current value
+  on each iteration.
+must_contain:
+  - "import json"
+  - "flush=True"
+  # JSON serialisation via json.dumps is required
+  - "print(json.dumps("
+must_not_contain:
+  - "flush=False"
+  # Bare print with a string literal instead of json.dumps — catches print("...")
+  # without catching print(json.dumps(...)) which is the correct pattern
+  - "print(\""
+  - "print(f\""
+  - "print('"

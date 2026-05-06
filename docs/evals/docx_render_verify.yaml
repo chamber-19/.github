@@ -1,0 +1,21 @@
+name: docx_render_verify
+input: |
+  Write a Python function using python-docx that creates a transmittal cover
+  letter document. The function should accept a project number, title, and
+  recipient name, add a heading and paragraph, and save the file. Explain
+  what verification step is required after saving.
+must_contain:
+  # Must use python-docx
+  - "python-docx"
+  # Must save to a path
+  - ".save("
+  # Must mention visual verification / rendering
+  - "render"
+  # Must acknowledge that extraction alone is not sufficient for layout QA
+  - "visual"
+must_not_contain:
+  # Must not skip verification
+  - "no verification needed"
+  - "no need to verify"
+  # Must not use deprecated Document().add_paragraph approach without a doc object
+  - "Document.add_paragraph"

@@ -1,0 +1,23 @@
+name: tauri_ipc_guard
+input: |
+  In the following code snippet, add the necessary guard and call a Tauri command named `myCommand`:
+
+  ```javascript
+  async function run() {
+    const result = await invoke('myCommand');
+    return result;
+  }
+  ```
+must_contain:
+  - "const isTauri"
+  - "typeof window !== \"undefined\""
+  # Double underscores required — __TAURI_INTERNALS__ not TAURI_INTERNALS
+  - "__TAURI_INTERNALS__"
+  - "if (isTauri)"
+  # invoke must appear inside the guard block
+  - "invoke("
+must_not_contain:
+  # Guard must be defined — a file with no isTauri definition at all is wrong
+  # We cannot block invoke() entirely because correct code calls it inside the guard.
+  # Instead we check that the raw unguarded pattern from the input is gone.
+  - "const result = await invoke('myCommand');"

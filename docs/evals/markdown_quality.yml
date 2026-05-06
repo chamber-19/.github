@@ -1,0 +1,39 @@
+name: markdown_quality
+input: |
+  Rewrite the following poorly formatted Markdown so it follows Chamber 19
+  documentation standards:
+
+  ---
+  This document is about how to use the launcher!! The launcher is a **very
+  powerful** and **robust** tool that can **seamlessly** install your apps.
+
+  Here is some important stuff you need to know:
+  - First thing you should do is making sure that the launcher is installed
+  - Running the installer
+  - You need to have the right version
+
+  ```
+  launcher.exe --install
+  ```
+
+  Click [here](https://github.com/chamber-19/launcher) for more info.
+  ---
+must_contain:
+  # File must start with a title heading
+  - "# "
+  # Commands must have a language identifier on code blocks
+  - "```bash"
+  # Link text must describe the destination — not "here"
+  - "[launcher"
+  # Active voice — "Run" not "running" or "you need to"
+  - "Run"
+must_not_contain:
+  # No exclamation points
+  - "!!"
+  - "seamlessly"
+  - "powerful"
+  - "robust"
+  # Link text must not say "here"
+  - "[here]"
+  # No blank language identifier on code blocks
+  - "```\nlauncher"
