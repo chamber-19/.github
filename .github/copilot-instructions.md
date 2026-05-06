@@ -147,7 +147,8 @@ relevant skill file before making changes in a given language or domain.
 | `VBA_EXCEL.md` | Writing VBA macros for the IFA-IFC-Checklist workbook |
 | `MARKDOWN.md` | Writing or editing any `.md` file in the org |
 | `DOCX.md` | Working with Word document generation in transmittal-builder |
-
+| `tauri2-skills/skills/source/` | Read before any Tauri 2 command, event, permission, or build change |
+| `threejs-skills/skills/source/` | Read before any Three.js/R3F work in block-library |
 ---
 
 ## Authoritative external references
