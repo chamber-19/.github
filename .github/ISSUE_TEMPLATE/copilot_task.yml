@@ -1,5 +1,5 @@
 name: Copilot task
-description: Well-scoped task for the Copilot cloud agent
+description: Copilot-only task. For normal work, use General issue or task
 title: "[Copilot]: "
 labels: ["copilot-task"]
 body:
