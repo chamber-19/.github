@@ -140,7 +140,7 @@ All rules in `AGENTS.md` apply here.
 
 ---
 
-### ~~5. `foundry-evals` has no instruction surface at all~~ ✅ Fixed
+### ~~5. `foundry-evals` has no instruction surface at all~~ — Resolved differently — foundry-evals was never a repo; eval sets consolidated into Foundry/evals/ via chamber-19/Foundry#121. The instruction content captured in this audit is reference material only — it does not deploy as a separate repo's copilot-instructions.md.
 
 **Severity:** Significant — zero guidance for eval set structure, labelling conventions, or completeness requirements
 
@@ -163,7 +163,7 @@ The repo's only content is `dep-reviewer/historical-prs.csv`. No `.github/`, no 
 
 ---
 
-### ~~6. `batch-fnr` and `foundry-evals` are absent from the org family table~~ ✅ Fixed
+### ~~6. `batch-fnr` and `foundry-evals` are absent from the org family table~~ — Added batch-fnr to family table. NOT adding foundry-evals because it never existed as a repo (see item 5 note).
 
 **File:** `.github/.github/copilot-instructions.md`, family table (lines 39–50)
 
@@ -363,8 +363,8 @@ Both are 3-line files headed "Historical archive — removed." The retirement re
 | ~~2~~ ✅ | ~~`block-library` Tauri 1 `isTauri` guard~~ | ~~`block-library/.github/copilot-instructions.md` line 38~~ |
 | ~~3~~ ✅ | ~~`docx.instructions.md` empty stub~~ | ~~`.github/.github/instructions/docx.instructions.md`~~ |
 | ~~4~~ ✅ | ~~`autocad-knowledge` missing `.github/`~~ | ~~Create `autocad-knowledge/.github/copilot-instructions.md`~~ |
-| ~~5~~ ✅ | ~~`foundry-evals` missing `.github/`~~ | ~~Create `foundry-evals/.github/copilot-instructions.md` — verbatim content above~~ |
-| ~~6~~ ✅ | ~~`batch-fnr` + `foundry-evals` absent from family table~~ | ~~`.github/.github/copilot-instructions.md` family table~~ |
+| ~~5~~ | ~~`foundry-evals` missing `.github/`~~ | Resolved differently — foundry-evals was never a repo; eval sets consolidated into Foundry/evals/ via chamber-19/Foundry#121 |
+| ~~6~~ ✅ | ~~`batch-fnr` + `foundry-evals` absent from family table~~ | Added batch-fnr; foundry-evals not added — never existed as a repo (see item 5 note) |
 | ~~7~~ ✅ | ~~`markdown.instructions` missing `.md` extension~~ | ~~Rename to `markdown.instructions.md`~~ |
 | ~~8~~ ✅ | ~~Foundry lacks prompts~~ | ~~Create `Foundry/.github/prompts/create-agent-eval.prompt.md` and `promote-agent.prompt.md` — verbatim content above~~ |
 | 9 | Foundry retired skill stubs | Delete `ml-pipeline.md`, `scoring-engine.md` (optional) |
