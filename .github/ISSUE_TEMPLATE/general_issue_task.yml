@@ -1,0 +1,29 @@
+name: General issue or task
+description: Use this for normal work that does not fit a Copilot task category
+title: "[Issue]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template for regular issues or tasks
+        when Copilot task templates do not fit.
+  - type: textarea
+    attributes:
+      label: Summary
+      description: What needs to be done?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Context
+      description: Why is this needed?
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Acceptance criteria
+      description: How will we know this is complete?
+      placeholder: |
+        - [ ]
+    validations:
+      required: false
