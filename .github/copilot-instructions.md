@@ -46,7 +46,7 @@ into the workflow.
 | `Foundry` | Local agent broker — enqueues jobs from GitHub and Discord, dispatches to Ollama, posts structured results back | C# (.NET), Python, Ollama |
 | `autocad-knowledge` | Reference patterns and knowledge base for AutoCAD .NET plugins | C#, Markdown |
 | `IFA-IFC-Checklist` | Macro-enabled Excel workbook for IFA/IFC pre-submittal checklists with ribbon buttons and PDF export | VBA, Excel |
-| `block-library` | Web dashboard for AutoCAD block libraries with Supabase backend | React, TypeScript, PySide6 |
+| `block-library` | Tauri 2 desktop DXF viewer with Google Drive catalog sync and SQLite local cache | Tauri 2.0, React, Three.js, Rust |
 
 Consumer apps (`transmittal-builder`, `Drawing-List-Manager`, `launcher`)
 pin `desktop-toolkit` in both ecosystems: `@chamber-19/desktop-toolkit`
@@ -149,6 +149,31 @@ relevant skill file before making changes in a given language or domain.
 | `DOCX.md` | Working with Word document generation in transmittal-builder |
 | `tauri2-skills/skills/source/` | Read before any Tauri 2 command, event, permission, or build change |
 | `threejs-skills/skills/source/` | Read before any Three.js/R3F work in block-library |
+| `AUTOCAD_ASSISTANT.md` | Writing Autodesk Assistant queries, session priming, or any programmatic MCP client code |
+
+---
+
+## AutoCAD knowledge base
+
+`autocad-knowledge` is the authoritative cross-repo reference for all AutoCAD work in the Chamber 19 family. Before writing any `.NET` plugin code, Autodesk Assistant queries, or DWG-processing logic in any repo, read the relevant files from that repo first.
+
+| When you are... | Read in `autocad-knowledge` |
+|---|---|
+| Writing any .NET code that touches the drawing database | `transaction-model.md` — foundational, no exceptions |
+| Working with block attributes (read/write/find) | `attributes.md` |
+| Batch-processing DWG files headlessly | `headless-processing.md` |
+| Choosing between .NET / JavaScript / APS Design Automation / APS Viewer | `api-surface-comparison.md` |
+| Configuring a `.csproj` for an AutoCAD plugin | `msbuild-setup.md` |
+| Writing Autodesk Assistant prompts | `patterns/` + `glossary/session-priming-prompt.md` |
+| Hitting an unexpected plugin crash or error | `gotchas.md`, then `gotchas/` directory |
+| Trying something that seems like it should work but doesn't | `limitations/` directory first |
+| Working with R3P substation, BESS, or P&C drawings | `electrical-engineering.md` + `glossary/` |
+
+**Three facts from this repo that apply org-wide:**
+- Block attributes are **not** queryable via Autodesk Assistant MCP. Attribute work requires `batch-fnr` or a custom .NET plugin. See `limitations/block-attributes-not-queryable.md`.
+- Plain polylines carry no electrical semantics. Wire connectivity requires ACADE (AutoCAD Electrical). See `limitations/plain-polyline-not-wire.md`.
+- The transaction model (`transaction-model.md`) is the foundation for **all** .NET entity code. No exceptions.
+
 ---
 
 ## Authoritative external references
