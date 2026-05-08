@@ -44,9 +44,9 @@ into the workflow.
 | `transmittal-builder` | Generates engineering transmittal packages — scans folders, renders Word templates to PDF, outputs packages | Tauri 2.0, Python FastAPI sidecar, React |
 | `Drawing-List-Manager` | Manages project drawing registers with editing, revision advancement, and validation | Tauri 2.0, Python FastAPI sidecar, React |
 | `Foundry` | Local agent broker — enqueues jobs from GitHub and Discord, dispatches to Ollama, posts structured results back | C# (.NET), Python, Ollama |
-| `foundry-evals` | Hand-labelled eval sets for all Foundry agents | CSV, Markdown |
 | `autocad-knowledge` | Reference patterns and knowledge base for AutoCAD .NET plugins | C#, Markdown |
 | `batch-fnr` | Batch DXF Find-and-Replace — Tauri 2 desktop app with headless .NET AutoCAD sidecar | Tauri 2.0, Rust, React, .NET |
+| `foundry-evals` | Hand-labelled eval sets for all Foundry agents | CSV, Markdown |
 | `IFA-IFC-Checklist` | Macro-enabled Excel workbook for IFA/IFC pre-submittal checklists with ribbon buttons and PDF export | VBA, Excel |
 | `block-library` | Tauri 2 desktop DXF viewer with Google Drive catalog sync and SQLite local cache | Tauri 2.0, React, Three.js, Rust |
 
