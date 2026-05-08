@@ -363,10 +363,10 @@ Both are 3-line files headed "Historical archive — removed." The retirement re
 | ~~2~~ ✅ | ~~`block-library` Tauri 1 `isTauri` guard~~ | ~~`block-library/.github/copilot-instructions.md` line 38~~ |
 | ~~3~~ ✅ | ~~`docx.instructions.md` empty stub~~ | ~~`.github/.github/instructions/docx.instructions.md`~~ |
 | ~~4~~ ✅ | ~~`autocad-knowledge` missing `.github/`~~ | ~~Create `autocad-knowledge/.github/copilot-instructions.md`~~ |
-| ~~5~~ ✅ | ~~`foundry-evals` missing `.github/`~~ | ~~Create `foundry-evals/.github/copilot-instructions.md`~~ |
+| ~~5~~ ✅ | ~~`foundry-evals` missing `.github/`~~ | ~~Create `foundry-evals/.github/copilot-instructions.md` — verbatim content above~~ |
 | ~~6~~ ✅ | ~~`batch-fnr` + `foundry-evals` absent from family table~~ | ~~`.github/.github/copilot-instructions.md` family table~~ |
 | ~~7~~ ✅ | ~~`markdown.instructions` missing `.md` extension~~ | ~~Rename to `markdown.instructions.md`~~ |
-| ~~8~~ ✅ | ~~Foundry lacks prompts~~ | ~~Create `Foundry/.github/prompts/` with 2 files~~ |
+| ~~8~~ ✅ | ~~Foundry lacks prompts~~ | ~~Create `Foundry/.github/prompts/create-agent-eval.prompt.md` and `promote-agent.prompt.md` — verbatim content above~~ |
 | 9 | Foundry retired skill stubs | Delete `ml-pipeline.md`, `scoring-engine.md` (optional) |
 
 ---
