@@ -1,0 +1,77 @@
+# Curated source of truth for the chamber-19 org family tables.
+# Add new repos here when they're created. Mark deprecated repos with status: archived.
+#
+# The reconciler:
+#   - VERIFIES every entry against live GitHub repo metadata
+#   - REGENERATES the tables in profile/README.md and .github/copilot-instructions.md
+#   - FAILS if reality and manifest disagree
+
+version: 1
+
+repos:
+  - name: desktop-toolkit
+    profile_role: "Shared framework for Tauri desktop apps — splash, updater, NSIS installer, Python sidecar plumbing"
+    copilot_role: "Shared framework for Tauri desktop apps"
+    stack: "Tauri 2.0, React, Rust, Python"
+    category: shared-framework
+  - name: launcher
+    profile_role: "Desktop tool shell — installs, updates, and launches Chamber 19 tools"
+    copilot_role: "Desktop tool shell — activation, app routing, updater"
+    stack: "Tauri 2.0, React, Rust"
+    category: shell
+  - name: transmittal-builder
+    profile_role: "Standalone Tauri app for generating engineering transmittal packages"
+    copilot_role: "Backend-only Tauri app — engineering transmittal package generator"
+    stack: "Tauri 2.0, Rust, Python"
+    category: tool
+  - name: Drawing-List-Manager
+    profile_role: "Standalone Tauri app for project drawing registers"
+    copilot_role: "Backend-only Tauri app — project drawing register"
+    stack: "Tauri 2.0, Rust"
+    category: tool
+  - name: batch-fnr
+    profile_role: "Batch DXF Find-and-Replace — Tauri 2 desktop app with headless .NET AutoCAD sidecar"
+    copilot_role: "Batch DXF Find-and-Replace with headless .NET AutoCAD sidecar"
+    stack: "Tauri 2.0, Rust, React, .NET"
+    category: tool
+  - name: block-library
+    profile_role: "Tauri 2 desktop DXF viewer with Google Drive catalog sync and SQLite local cache"
+    copilot_role: "Tauri 2 desktop DXF viewer (frontend-first because of Three.js)"
+    stack: "Tauri 2.0, React, Three.js, Rust"
+    category: tool
+  - name: Foundry
+    profile_role: "Local agent broker — routes GitHub and Discord jobs to local LLMs via Ollama"
+    copilot_role: "Local agent broker — Ollama-backed dep-reviewer and other agents"
+    stack: ".NET, Ollama, Microsoft.SemanticKernel"
+    category: agent-broker
+  - name: autocad-knowledge
+    profile_role: "Reference patterns and knowledge base for AutoCAD .NET plugins"
+    copilot_role: "AutoCAD .NET pattern reference — source of truth for AUTOCAD_DOTNET.md skill"
+    stack: "Markdown, C# samples"
+    category: knowledge-base
+  - name: chamber-19-autocad-mcp
+    profile_role: "AutoCAD .NET plugin exposing an MCP server inside acad.exe — read-only inspection tools for LLM agents"
+    copilot_role: "MCP server inside AutoCAD — read-only inspection surface for LLM agents"
+    stack: ".NET, PowerShell"
+    category: shared-framework
+  - name: IFA-IFC-Checklist
+    profile_role: "Macro-enabled Excel workbook for IFA and IFC pre-submittal checklists"
+    copilot_role: "Macro-enabled Excel workbook for IFA/IFC pre-submittal checklists"
+    stack: "Excel VBA"
+    category: tool
+  - name: .github
+    profile_role: "TODO: curate whether this org-config repo should be listed in the public tools table"
+    copilot_role: "TODO: curate role copy for this repo in family-table generation"
+    stack: "Markdown, YAML"
+    category: needs-curation
+    status: needs-curation
+
+table_targets:
+  profile:
+    file: profile/README.md
+    columns: [Repo, Role]
+    repo_link: "[`{name}`](https://github.com/chamber-19/{name})"
+  copilot:
+    file: .github/copilot-instructions.md
+    columns: [Repo, Role, Stack]
+    repo_link: "`{name}`"

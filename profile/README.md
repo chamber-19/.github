@@ -5,6 +5,7 @@ around AutoCAD and Tauri.
 
 ## Tools
 
+<!-- family-table:start -->
 | Repo | Role |
 |---|---|
 | [`desktop-toolkit`](https://github.com/chamber-19/desktop-toolkit) | Shared framework for Tauri desktop apps — splash, updater, NSIS installer, Python sidecar plumbing |
@@ -15,6 +16,7 @@ around AutoCAD and Tauri.
 | [`autocad-knowledge`](https://github.com/chamber-19/autocad-knowledge) | Reference patterns and knowledge base for AutoCAD .NET plugins |
 | [`IFA-IFC-Checklist`](https://github.com/chamber-19/IFA-IFC-Checklist) | Macro-enabled Excel workbook for IFA and IFC pre-submittal checklists |
 | [`block-library`](https://github.com/chamber-19/block-library) | Web dashboard for managing AutoCAD block libraries |
+<!-- family-table:end -->
 
 ## Design system
 
