@@ -1,7 +1,8 @@
 [CmdletBinding()]
 param(
     [string]$ManifestPath = (Join-Path $PSScriptRoot "family-manifest.yml"),
-    [switch]$DryRun
+    [switch]$DryRun,
+    [switch]$Check
 )
 
 $ErrorActionPreference = "Stop"
@@ -377,6 +378,9 @@ try {
         }
         else {
             Write-Host "Dry run complete. Would update: $($updatedFiles -join ', ')" -ForegroundColor Yellow
+            if ($Check) {
+                exit 1
+            }
         }
     }
 }

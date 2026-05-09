@@ -13,8 +13,11 @@ on:
       - .github/workflows/reconcile-family-table.yml
   pull_request:
     paths:
+      - profile/README.md
+      - .github/copilot-instructions.md
       - scripts/family-manifest.yml
       - scripts/reconcile-family-table.ps1
+      - .github/workflows/reconcile-family-table.yml
 
 permissions:
   contents: write
@@ -171,4 +174,4 @@ jobs:
 
       - name: Reconciler dry run
         shell: pwsh
-        run: pwsh -File scripts/reconcile-family-table.ps1 -DryRun
+        run: pwsh -File scripts/reconcile-family-table.ps1 -DryRun -Check

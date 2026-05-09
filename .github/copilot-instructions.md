@@ -44,7 +44,7 @@ into the workflow.
 | `transmittal-builder` | Tauri app with Python sidecar — engineering transmittal package generator | Tauri 2.0, Rust, Python |
 | `Drawing-List-Manager` | Tauri app with Python sidecar — project drawing register | Tauri 2.0, Rust |
 | `batch-fnr` | Batch DXF Find-and-Replace with headless .NET AutoCAD sidecar | Tauri 2.0, Rust, React, .NET |
-| `block-library` | Tauri 2 desktop DXF viewer (frontend-first because of Three.js) | Tauri 2.0, React, Three.js, Rust |
+| `block-library` | Tauri 2 desktop DXF viewer with Google Drive catalog sync and SQLite local cache | Tauri 2.0, React, Three.js, Rust |
 | `Foundry` | Local agent broker — Ollama-backed dep-reviewer and other agents | .NET, Ollama, Microsoft.SemanticKernel |
 | `autocad-knowledge` | AutoCAD .NET pattern reference — source of truth for AUTOCAD_DOTNET.md skill | Markdown, C# samples |
 | `chamber-19-autocad-mcp` | MCP server inside AutoCAD — read-only inspection surface for LLM agents | .NET, PowerShell |
@@ -179,7 +179,6 @@ relevant skill file before making changes in a given language or domain.
 | `tauri2-skills/skills/source/` | Read before any Tauri 2 command, event, permission, or build change |
 | `threejs-skills/skills/source/` | Read before any Three.js/R3F work in block-library |
 | `AUTOCAD_ASSISTANT.md` | Writing Autodesk Assistant queries, session priming, or any programmatic MCP client code |
-| `AUTOCAD_INTERPRETIVE_DANCE.md` | [adversarial-test] Intentionally broken skill link — see `docs/skills/AUTOCAD_INTERPRETIVE_DANCE.md` |
 
 ---
 
