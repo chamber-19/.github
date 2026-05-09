@@ -47,7 +47,6 @@ into the workflow.
 | `block-library` | Tauri 2 desktop DXF viewer with Google Drive catalog sync and SQLite local cache | Tauri 2.0, React, Three.js, Rust |
 | `Foundry` | Local agent broker — Ollama-backed dep-reviewer and other agents | .NET, Ollama, Microsoft.SemanticKernel |
 | `autocad-knowledge` | AutoCAD .NET pattern reference — source of truth for AUTOCAD_DOTNET.md skill | Markdown, C# samples |
-| `chamber-19-autocad-mcp` | MCP server inside AutoCAD — read-only inspection surface for LLM agents | .NET, PowerShell |
 | `IFA-IFC-Checklist` | Macro-enabled Excel workbook for IFA/IFC pre-submittal checklists | Excel VBA |
 | `.github` | TODO: curate role copy for this repo in family-table generation | Markdown, YAML |
 <!-- family-table:end -->

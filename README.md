@@ -42,6 +42,7 @@ files across the org. Read the relevant skill before making changes:
 | `VBA_EXCEL.md` | VBA macros for IFA-IFC-Checklist |
 | `MARKDOWN.md` | Any `.md` file in the org |
 | `DOCX.md` | Word document generation (transmittal-builder) |
+| `docs/skills/AUTOCAD_INTERPRETIVE_DANCE.md` | Interpretive dance patterns for AutoCAD entities |
 
 ## Contributing
 

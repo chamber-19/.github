@@ -16,7 +16,6 @@ around AutoCAD and Tauri.
 | [`block-library`](https://github.com/chamber-19/block-library) | Tauri 2 desktop DXF viewer with Google Drive catalog sync and SQLite local cache |
 | [`Foundry`](https://github.com/chamber-19/Foundry) | Local agent broker — routes GitHub and Discord jobs to local LLMs via Ollama |
 | [`autocad-knowledge`](https://github.com/chamber-19/autocad-knowledge) | Reference patterns and knowledge base for AutoCAD .NET plugins |
-| [`chamber-19-autocad-mcp`](https://github.com/chamber-19/chamber-19-autocad-mcp) | AutoCAD .NET plugin exposing an MCP server inside acad.exe — read-only inspection tools for LLM agents |
 | [`IFA-IFC-Checklist`](https://github.com/chamber-19/IFA-IFC-Checklist) | Macro-enabled Excel workbook for IFA and IFC pre-submittal checklists |
 | [`.github`](https://github.com/chamber-19/.github) | TODO: curate whether this org-config repo should be listed in the public tools table |
 <!-- family-table:end -->
