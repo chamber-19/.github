@@ -137,7 +137,10 @@ jobs:
               if code != 0:
                   return None, None
               try:
-                  parts = json.loads(json.loads(out))
+                  parsed = json.loads(out)
+                  if isinstance(parsed, str):
+                      parsed = json.loads(parsed)
+                  parts = parsed
                   raw_b64 = parts[0].replace("\n", "")
                   content = base64.b64decode(raw_b64).decode("utf-8")
                   return content, parts[1]
@@ -383,7 +386,10 @@ jobs:
                   continue
 
               try:
-                  repo_meta = json.loads(json.loads(repo_json))
+                  parsed = json.loads(repo_json)
+                  if isinstance(parsed, str):
+                      parsed = json.loads(parsed)
+                  repo_meta = parsed
                   is_fork, is_archived, default_branch = repo_meta
               except Exception:
                   gha_notice(f"Skipping {repo_name} — could not parse repo metadata")
