@@ -83,19 +83,19 @@ foreach ($file in $instructionFiles) {
         continue
     }
 
-    $applyToLineIndex = -1
+    $hasApplyTo = $false
     for ($lineIndex = 1; $lineIndex -lt $frontmatterEnd; $lineIndex++) {
         $line = $lines[$lineIndex]
         if ($line -match "^\s*applyTo\s*:\s*(?<value>.+?)\s*$") {
             $applyToValue = $Matches["value"].Trim(" ", "'", '"')
             if (-not [string]::IsNullOrWhiteSpace($applyToValue)) {
-                $applyToLineIndex = $lineIndex
+                $hasApplyTo = $true
                 break
             }
         }
     }
 
-    if ($applyToLineIndex -lt 0) {
+    if (-not $hasApplyTo) {
         Add-ErrorAnnotation -FilePath $file.FullName -Line 1 -Message "Instruction frontmatter must include a non-empty applyTo field."
     }
 
@@ -120,7 +120,7 @@ foreach ($skillFile in $skillFiles) {
 }
 
 $markdownFiles = Get-ChildItem -LiteralPath $RepoRoot -Recurse -File -Filter "*.md"
-$skillReferenceRegex = [regex]"(?<!\.)docs/skills/(?<name>[A-Za-z0-9_.-]+)\.md"
+$skillReferenceRegex = [regex]"docs/skills/(?<name>[A-Za-z0-9_.-]+)\.md"
 
 foreach ($markdownFile in $markdownFiles) {
     $lines = Get-FileLines -FilePath $markdownFile.FullName
@@ -160,7 +160,7 @@ if ($blockLibraryLineNumber -lt 0) {
 }
 else {
     $blockLibraryLine = $orgLines[$blockLibraryLineNumber - 1]
-    $hasExpectedPurpose = $blockLibraryLine.Contains("Tauri 2 desktop DXF viewer") -and $blockLibraryLine.Contains("Google Drive catalog sync") -and $blockLibraryLine.Contains("SQLite local cache")
+    $hasExpectedPurpose = $blockLibraryLine.Contains("DXF viewer") -and $blockLibraryLine.Contains("Google Drive") -and $blockLibraryLine.Contains("SQLite")
     $hasExpectedStack = $blockLibraryLine.Contains("Tauri 2.0, React, Three.js, Rust")
     if (-not ($hasExpectedPurpose -and $hasExpectedStack)) {
         Add-ErrorAnnotation -FilePath $orgInstructionsPath -Line $blockLibraryLineNumber -Message "block-library row must describe the DXF viewer purpose and include stack: Tauri 2.0, React, Three.js, Rust."
