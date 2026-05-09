@@ -15,18 +15,18 @@ repos:
     stack: "Tauri 2.0, React, Rust, Python"
     category: shared-framework
   - name: launcher
-    profile_role: "Desktop tool shell — installs, updates, and launches Chamber 19 tools"
-    copilot_role: "Desktop tool shell — activation, app routing, updater"
+    profile_role: "Desktop launcher and updater — installs, updates, and launches Chamber 19 tools"
+    copilot_role: "Desktop launcher and updater — activation, app routing, updater"
     stack: "Tauri 2.0, React, Rust"
     category: shell
   - name: transmittal-builder
     profile_role: "Standalone Tauri app for generating engineering transmittal packages"
-    copilot_role: "Backend-only Tauri app — engineering transmittal package generator"
+    copilot_role: "Tauri app with Python sidecar — engineering transmittal package generator"
     stack: "Tauri 2.0, Rust, Python"
     category: tool
   - name: Drawing-List-Manager
     profile_role: "Standalone Tauri app for project drawing registers"
-    copilot_role: "Backend-only Tauri app — project drawing register"
+    copilot_role: "Tauri app with Python sidecar — project drawing register"
     stack: "Tauri 2.0, Rust"
     category: tool
   - name: batch-fnr

@@ -10,6 +10,24 @@ Set-StrictMode -Version Latest
 $Org = "chamber-19"
 $ApiBaseUrl = "https://api.github.com"
 
+function Assert-PowerShellVersion {
+    if ($PSVersionTable.PSVersion.Major -lt 7) {
+        throw "PowerShell 7+ is required."
+    }
+}
+
+function Get-PythonCommand {
+    if (Get-Command -Name python3 -ErrorAction SilentlyContinue) {
+        return "python3"
+    }
+
+    if (Get-Command -Name python -ErrorAction SilentlyContinue) {
+        return "python"
+    }
+
+    throw "YAML parser fallback requires Python 3 with PyYAML, but no python executable was found."
+}
+
 function Get-GitHubHeaders {
     $headers = @{
         Accept = "application/vnd.github+json"
@@ -246,17 +264,21 @@ data = yaml.safe_load(sys.stdin.read())
 print(json.dumps(data))
 "@
 
+    $pythonCommand = Get-PythonCommand
+
     try {
-        $json = $Yaml | python -c $pythonScript
+        $json = $Yaml | & $pythonCommand -c $pythonScript
     }
     catch {
-        throw "Failed to parse YAML manifest. Ensure Python with PyYAML is available: $($_.Exception.Message)"
+        throw "Failed to parse YAML manifest. Ensure Python 3 with PyYAML is available: $($_.Exception.Message)"
     }
 
     return $json | ConvertFrom-Json
 }
 
 try {
+    Assert-PowerShellVersion
+
     if (-not (Test-Path -LiteralPath $ManifestPath)) {
         throw "Manifest file not found at '$ManifestPath'."
     }
