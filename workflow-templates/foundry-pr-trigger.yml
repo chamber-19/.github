@@ -118,6 +118,8 @@ jobs:
               DEP_NAME="${BASH_REMATCH[1]}"
               FROM_VERSION="${BASH_REMATCH[2]}"
               TO_VERSION="${BASH_REMATCH[3]}"
+            else
+              echo "::notice::Could not parse package/version from Dependabot PR title — sending empty fields to Foundry"
             fi
 
             LABEL_NAMES=$(echo "$PR_JSON" | jq -r '.labels[].name' | tr '\n' ' ')

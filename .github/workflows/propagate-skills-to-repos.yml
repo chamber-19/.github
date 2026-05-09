@@ -87,14 +87,15 @@ jobs:
           TRIGGER_REPO: ${{ github.repository }}
         run: |
           python3 - <<'PY'
-          import os, sys, json, base64, subprocess, textwrap
+          import os, sys, json, base64, subprocess, textwrap, re
 
           ORG = "chamber-19"
           BRANCH_NAME = f"auto/sync-copilot-instructions-{os.environ['SHORT_SHA']}"
           TRIGGER_SHA = os.environ["TRIGGER_SHA"]
           TRIGGER_REPO = os.environ["TRIGGER_REPO"]
 
-          # Repos to skip (source-of-truth and non-code repos)
+          # Repos to skip (source-of-truth and non-code repos).
+          # Update this set when new source-of-truth repos are added to the org.
           SKIP_REPOS = {".github", "autocad-knowledge", "org-maintenance"}
 
           # Existing skill names (uppercase, no extension)
@@ -147,8 +148,7 @@ jobs:
               issues = []
 
               # Check for stale docs/skills/ references (skill no longer exists)
-              import re
-              for m in re.finditer(r"docs/skills/([A-Za-z0-9_.+-]+)\.[Mm][Dd]", content):
+              for m in re.finditer(r"docs/skills/([A-Za-z0-9_.+-]+)\.md", content, re.IGNORECASE):
                   ref_name = os.path.splitext(m.group(1))[0].upper()
                   if ref_name not in SKILL_NAMES:
                       issues.append({
@@ -166,50 +166,54 @@ jobs:
                   required.add("AUTOCAD_DOTNET")
 
               # Check which required skills are missing
-              content_upper = content.upper()
               for skill in sorted(required):
                   if skill not in SKILL_NAMES:
                       continue  # skill doesn't exist org-side, skip
-                  # Accept any casing of the skill name followed by .md
-                  if not re.search(rf"{re.escape(skill)}\.[Mm][Dd]", content, re.IGNORECASE):
+                  if not re.search(rf"docs/skills/{re.escape(skill)}\.md", content, re.IGNORECASE):
                       issues.append({"type": "missing_ref", "skill": skill})
 
               return issues
 
+          def skill_ref_line(skill_name, skill_file):
+              """Return the standard skill reference bullet for a given skill."""
+              label = "AutoCAD .NET" if skill_name == "AUTOCAD_DOTNET" else skill_name.replace("_", " ").title()
+              return (
+                  f"- Read [`docs/skills/{skill_file}`]"
+                  f"(https://github.com/chamber-19/.github/blob/main/docs/skills/{skill_file})"
+                  f" before any {label} work."
+              )
+
+          def find_skill_file(skill_name):
+              """Return the actual filename for a skill (preserving original casing), or None."""
+              for f in os.listdir("docs/skills"):
+                  if os.path.splitext(f)[0].upper() == skill_name:
+                      return f
+              return None
+
           def build_fixed_content(original, issues, stack, repo_name):
               """
               Return corrected content.
-              - Removes stale docs/skills/ paths.
+              - Removes all occurrences of stale docs/skills/ paths.
               - Appends missing required skill references at the end.
               - Preserves all existing custom content.
               """
-              import re
               content = original
 
-              # Remove stale skill references from the text (replace first occurrence only)
+              # Replace all occurrences of each stale skill reference
               for issue in issues:
                   if issue["type"] == "stale_ref":
                       stale_path = issue["path"]
                       replacement = f"<!-- removed stale ref: {stale_path} (skill no longer exists) -->"
-                      content = re.sub(re.escape(stale_path), replacement, content, count=1)
+                      content = re.sub(re.escape(stale_path), replacement, content)
 
               # Collect skills to add
               to_add = [i["skill"] for i in issues if i["type"] == "missing_ref"]
               if to_add:
-                  # Find the actual filename (preserving original casing)
                   additions = []
                   for skill in sorted(to_add):
-                      # Find matching file in docs/skills/
-                      skill_file = None
-                      skills_dir = "docs/skills"
-                      for f in os.listdir(skills_dir):
-                          if os.path.splitext(f)[0].upper() == skill:
-                              skill_file = f
-                              break
-                      if skill_file:
-                          additions.append(
-                              f"- Read [`docs/skills/{skill_file}`](https://github.com/chamber-19/.github/blob/main/docs/skills/{skill_file}) before any {skill.replace('_', ' ').title()} work."
-                          )
+                      sf = find_skill_file(skill)
+                      if sf:
+                          additions.append(skill_ref_line(skill, sf))
 
                   if additions:
                       block = "\n\n<!-- Added by chamber-19-skill-sync — required skill references for this repo's stack -->\n"
@@ -229,22 +233,16 @@ jobs:
                   "",
               ]
 
-              # Required skills for this stack
               refs = []
               for stack_token, skill in STACK_SKILL_MAP.items():
                   if stack_token.lower() in stack.lower() and skill in SKILL_NAMES:
-                      skill_file = None
-                      for f in os.listdir("docs/skills"):
-                          if os.path.splitext(f)[0].upper() == skill:
-                              skill_file = f
-                              break
-                      if skill_file:
-                          refs.append(f"- Read [`docs/skills/{skill_file}`](https://github.com/chamber-19/.github/blob/main/docs/skills/{skill_file}) before any {skill.replace('_', ' ').title()} work.")
+                      sf = find_skill_file(skill)
+                      if sf:
+                          refs.append(skill_ref_line(skill, sf))
               if repo_name in AUTOCAD_REPOS and "AUTOCAD_DOTNET" in SKILL_NAMES:
-                  for f in os.listdir("docs/skills"):
-                      if os.path.splitext(f)[0].upper() == "AUTOCAD_DOTNET":
-                          refs.append(f"- Read [`docs/skills/{f}`](https://github.com/chamber-19/.github/blob/main/docs/skills/{f}) before any AutoCAD .NET work.")
-                          break
+                  sf = find_skill_file("AUTOCAD_DOTNET")
+                  if sf:
+                      refs.append(skill_ref_line("AUTOCAD_DOTNET", sf))
 
               if refs:
                   lines.append("## Required reading")
@@ -357,8 +355,12 @@ jobs:
 
           # --- Main loop ---
           import yaml
-          with open("scripts/family-manifest.yml") as f:
-              manifest = yaml.safe_load(f)
+          try:
+              with open("scripts/family-manifest.yml") as f:
+                  manifest = yaml.safe_load(f)
+          except (OSError, yaml.YAMLError) as exc:
+              print(f"::error::Could not load family manifest from scripts/family-manifest.yml — ensure it exists and is valid YAML. Error: {exc}", flush=True)
+              sys.exit(1)
 
           for repo_entry in manifest["repos"]:
               repo_name = repo_entry["name"]
