@@ -39,11 +39,11 @@ into the workflow.
 | Repo | Purpose | Primary stack |
 |---|---|---|
 | `.github` | Org-wide config, shared instructions, skill files, memory, evals | Markdown, YAML |
-| `desktop-toolkit` | Shared scaffolding for all Tauri desktop tools — UI primitives, sidecar boilerplate, NSIS installer, CI templates | Rust, Tauri 2.0, React, Python |
-| `launcher` | Installs, updates, and launches Chamber 19 desktop tools | Tauri 2.0, React |
-| `transmittal-builder` | Generates engineering transmittal packages — scans folders, renders Word templates to PDF, outputs packages | Tauri 2.0, Python FastAPI sidecar, React |
-| `Drawing-List-Manager` | Manages project drawing registers with editing, revision advancement, and validation | Tauri 2.0, Python FastAPI sidecar, React |
-| `Foundry` | Local agent broker — enqueues jobs from GitHub and Discord, dispatches to Ollama, posts structured results back | C# (.NET), Python, Ollama |
+| `desktop-toolkit` | Shared framework: Tauri primitives, sidecar boilerplate, NSIS installer, CI templates, **activation service** | Rust, Tauri 2.0, React, Python, FastAPI |
+| `launcher` | Universal Tauri shell: desktop integration, app routing, activation gate, updates for all tools | Tauri 2.0, React, Rust |
+| `transmittal-builder` | Backend service: generates transmittal packages (scans folders, renders Word, merges PDFs) | Python FastAPI |
+| `Drawing-List-Manager` | Backend service: manages drawing registers (editing, revisions, validation) | Python FastAPI |
+| `Foundry` | Local agent broker: enqueues GitHub/Discord jobs, dispatches to Ollama, posts results | C# (.NET), Python, Ollama |
 | `autocad-knowledge` | Reference patterns and knowledge base for AutoCAD .NET plugins | C#, Markdown |
 | `batch-fnr` | Batch DXF Find-and-Replace — Tauri 2 desktop app with headless .NET AutoCAD sidecar | Tauri 2.0, Rust, React, .NET |
 | `IFA-IFC-Checklist` | Macro-enabled Excel workbook for IFA/IFC pre-submittal checklists with ribbon buttons and PDF export | VBA, Excel |
@@ -53,6 +53,31 @@ Consumer apps (`transmittal-builder`, `Drawing-List-Manager`, `launcher`)
 pin `desktop-toolkit` in both ecosystems: `@chamber-19/desktop-toolkit`
 (npm) and `desktop-toolkit` (Cargo). Both pins must be updated together
 in a dedicated PR. A toolkit release does not auto-propagate.
+
+---
+
+## Desktop App Architecture (May 2026 Refactor)
+
+Chamber 19 desktop tools now follow a **shared shell + per-app backend** model:
+
+**Launcher** (one universal Tauri shell for all apps):
+- Handles desktop integration, app routing, activation gate, updates
+- Deploys once; all tools use it
+- No tool-specific installers
+
+**Backends** (per-app Python FastAPI services):
+- Stateless HTTP services — can run locally, remotely, in containers
+- Examples: `transmittal-builder`, `Drawing-List-Manager`
+- Launcher discovers & routes to them via HTTP
+
+**Activation** (centralized in `desktop-toolkit`):
+- PIN generation, office IP gating, hardware fingerprinting, token signing
+- All tools reuse the same activation logic
+- Server-side: FastAPI service in `desktop-toolkit`
+- Client-side: Tauri Rust commands in `launcher`
+
+**When adding a new tool:** Create backend service, register route in launcher config, done.
+Launcher doesn't need rebuilding per tool.
 
 ---
 
