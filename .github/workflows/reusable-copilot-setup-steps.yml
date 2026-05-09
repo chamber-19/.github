@@ -1,0 +1,130 @@
+name: Reusable Copilot Setup Steps
+
+on:
+  workflow_call:
+    inputs:
+      node:
+        description: Install Node.js and run npm ci
+        required: false
+        type: boolean
+        default: true
+      python:
+        description: Install Python and pip requirements
+        required: false
+        type: boolean
+        default: true
+      rust:
+        description: Install Rust toolchain and cache workspace
+        required: false
+        type: boolean
+        default: true
+      tauri-linux-deps:
+        description: Install Linux system dependencies required for Tauri builds
+        required: false
+        type: boolean
+        default: false
+      node-working-directory:
+        description: Working directory where npm ci runs
+        required: false
+        type: string
+        default: "."
+      python-working-directory:
+        description: Working directory where pip install runs
+        required: false
+        type: string
+        default: "."
+      rust-workspace:
+        description: Workspace path passed to rust-cache
+        required: false
+        type: string
+        default: "."
+      python-requirements-file:
+        description: Requirements file path resolved from python-working-directory
+        required: false
+        type: string
+        default: "requirements.txt"
+      gh-packages-scope:
+        description: Optional npm scope for GitHub Packages registry
+        required: false
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        if: ${{ inputs.node && inputs.gh-packages-scope == '' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: ${{ inputs.node-working-directory }}/package-lock.json
+
+      - name: Setup Node.js (GitHub Packages)
+        if: ${{ inputs.node && inputs.gh-packages-scope != '' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: ${{ inputs.node-working-directory }}/package-lock.json
+          registry-url: "https://npm.pkg.github.com"
+          scope: ${{ inputs.gh-packages-scope }}
+
+      - name: Install Node dependencies
+        if: ${{ inputs.node && inputs.gh-packages-scope == '' }}
+        working-directory: ${{ inputs.node-working-directory }}
+        run: npm ci
+
+      - name: Install Node dependencies (GitHub Packages)
+        if: ${{ inputs.node && inputs.gh-packages-scope != '' }}
+        working-directory: ${{ inputs.node-working-directory }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm ci
+
+      - name: Setup Python
+        if: ${{ inputs.python }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: ${{ inputs.python-working-directory }}/${{ inputs.python-requirements-file }}
+
+      - name: Install Python dependencies
+        if: ${{ inputs.python }}
+        working-directory: ${{ inputs.python-working-directory }}
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r "${{ inputs.python-requirements-file }}"
+
+      - name: Setup Rust
+        if: ${{ inputs.rust }}
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.77.2"
+          components: clippy,rustfmt
+
+      - name: Cache Rust artifacts
+        if: ${{ inputs.rust }}
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ${{ inputs.rust-workspace }}
+
+      - name: Install Tauri Linux dependencies
+        if: ${{ inputs.tauri-linux-deps }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libwebkit2gtk-4.1-dev \
+            libgtk-3-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            patchelf
