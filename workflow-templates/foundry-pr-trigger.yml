@@ -51,7 +51,7 @@ jobs:
           missing=()
           [[ -z "$_TS_CLIENT_ID" ]]  && missing+=("TS_OAUTH_CLIENT_ID")
           [[ -z "$_TS_SECRET" ]]     && missing+=("TS_OAUTH_SECRET")
-          [[ -z "$_FOUNDRY_TOKEN" ]] && missing+=("FOUNDRY_BEARER_TOKEN (must match bearerToken in Foundry settings)")
+          [[ -z "$_FOUNDRY_TOKEN" ]] && missing+=("FOUNDRY_BEARER_TOKEN")
           if [[ ${#missing[@]} -gt 0 ]]; then
             for s in "${missing[@]}"; do
               echo "::error::Required secret is not set: ${s}"
@@ -91,7 +91,9 @@ jobs:
           PR_AUTHOR=$(echo "$PR_JSON" | jq -r '.author.login')
 
           # Diff stat — fetch base branch tip for three-dot comparison
-          git fetch origin "${BASE_REF}" --depth=1 2>/dev/null || true
+          if ! git fetch origin "${BASE_REF}" --depth=1 2>/dev/null; then
+            echo "::notice::Could not fetch origin/${BASE_REF} — diff stat will be empty"
+          fi
           DIFF_STAT=$(git diff --stat "origin/${BASE_REF}...HEAD" 2>/dev/null || echo "")
 
           # Dependency graph compare — gracefully skip on 404 or if not enabled
@@ -111,9 +113,12 @@ jobs:
           TO_VERSION=""
           ECOSYSTEM=""
           if [[ "$ACTOR" == "dependabot[bot]" ]]; then
-            DEP_NAME=$(echo "$PR_TITLE" | grep -ioP '(?<=bump )[^\s]+(?= from)' | head -1 || true)
-            FROM_VERSION=$(echo "$PR_TITLE" | grep -ioP '(?<=from )[^\s]+(?= to)' | head -1 || true)
-            TO_VERSION=$(echo "$PR_TITLE" | grep -ioP '(?<= to )[^\s]+$' | head -1 || true)
+            # Parse standard Dependabot title: "bump X from A to B" (any casing, optional prefix)
+            if [[ "$PR_TITLE" =~ [Bb]ump[[:space:]]+([^[:space:]]+)[[:space:]]+[Ff]rom[[:space:]]+([^[:space:]]+)[[:space:]]+[Tt]o[[:space:]]+([^[:space:]]+) ]]; then
+              DEP_NAME="${BASH_REMATCH[1]}"
+              FROM_VERSION="${BASH_REMATCH[2]}"
+              TO_VERSION="${BASH_REMATCH[3]}"
+            fi
 
             LABEL_NAMES=$(echo "$PR_JSON" | jq -r '.labels[].name' | tr '\n' ' ')
             if echo "$LABEL_NAMES" | grep -qi "npm\|javascript\|nodejs"; then
@@ -170,6 +175,7 @@ jobs:
             -H "Content-Type: application/json" \
             -d @/tmp/foundry-payload.json \
             "https://foundry.tail05ac8a.ts.net:57420/api/review/dependency-pr")
+            # The Foundry address is fixed for the chamber-19 deployment.
 
           HTTP_BODY=$(echo "$RESPONSE" | head -n -1)
           HTTP_CODE=$(echo "$RESPONSE" | tail -n 1)

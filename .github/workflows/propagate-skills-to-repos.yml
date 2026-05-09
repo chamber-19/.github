@@ -43,7 +43,7 @@ jobs:
           [[ -z "$_APP_KEY" ]] && missing+=("SKILLS_SYNC_APP_PRIVATE_KEY")
           if [[ ${#missing[@]} -gt 0 ]]; then
             for s in "${missing[@]}"; do
-              echo "::error::Required secret is not set: ${s}. Add it as a repo secret in chamber-19/.github with the same value used in chamber-19/autocad-knowledge."
+              echo "::error::Required secret is not set: ${s}. Add it as a repo secret in chamber-19/.github."
             done
             exit 1
           fi
@@ -157,11 +157,6 @@ jobs:
                           "name": ref_name,
                       })
 
-              # Check for references pointing outside chamber-19
-              if re.search(r"docs/skills/", content) and "chamber-19" not in content:
-                  # Heuristic — only flag if there's an explicit wrong-org URL pattern
-                  pass
-
               # Determine required skills from stack
               required = set()
               for stack_token, skill in STACK_SKILL_MAP.items():
@@ -191,14 +186,12 @@ jobs:
               import re
               content = original
 
-              # Remove stale skill references from the text
+              # Remove stale skill references from the text (replace first occurrence only)
               for issue in issues:
                   if issue["type"] == "stale_ref":
-                      # Replace the stale path with a note
-                      content = content.replace(
-                          issue["path"],
-                          f"<!-- removed stale ref: {issue['path']} (skill no longer exists) -->"
-                      )
+                      stale_path = issue["path"]
+                      replacement = f"<!-- removed stale ref: {stale_path} (skill no longer exists) -->"
+                      content = re.sub(re.escape(stale_path), replacement, content, count=1)
 
               # Collect skills to add
               to_add = [i["skill"] for i in issues if i["type"] == "missing_ref"]
@@ -266,32 +259,29 @@ jobs:
               return code == 0
 
           def open_pr(repo_name, branch, default_branch, file_path, file_sha, new_content, issues, is_new_file):
-              # Create branch
+              # Resolve HEAD SHA directly from the branch ref
               code, out, _ = gh(
-                  "api", f"/repos/{ORG}/{repo_name}/git/refs",
-                  "--method", "GET",
-                  "--jq", f'.[] | select(.ref == "refs/heads/{default_branch}") | .object.sha'
+                  "api", f"/repos/{ORG}/{repo_name}/git/ref/heads/{default_branch}",
+                  "--jq", ".object.sha"
               )
-              if code != 0 or not out:
-                  # Try direct ref lookup
-                  code, out, _ = gh(
-                      "api", f"/repos/{ORG}/{repo_name}/git/ref/heads/{default_branch}",
-                      "--jq", ".object.sha"
-                  )
-              if code != 0:
+              if code != 0 or not out.strip():
                   gha_error(f"Could not resolve HEAD SHA for {repo_name}/{default_branch} — skipping")
                   return
 
               base_sha = out.strip()
-              code, _, err = gh(
-                  "api", f"/repos/{ORG}/{repo_name}/git/refs",
-                  "--method", "POST",
-                  "-f", f"ref=refs/heads/{branch}",
-                  "-f", f"sha={base_sha}"
-              )
-              if code != 0 and "already exists" not in err:
-                  gha_error(f"Could not create branch {branch} in {repo_name}: {err}")
-                  return
+
+              # Check branch existence before attempting to create it
+              br_exists = branch_exists(repo_name, branch)
+              if not br_exists:
+                  code, _, err = gh(
+                      "api", f"/repos/{ORG}/{repo_name}/git/refs",
+                      "--method", "POST",
+                      "-f", f"ref=refs/heads/{branch}",
+                      "-f", f"sha={base_sha}"
+                  )
+                  if code != 0:
+                      gha_error(f"Could not create branch {branch} in {repo_name}: {err}")
+                      return
 
               # Commit the fixed file
               encoded = base64.b64encode(new_content.encode("utf-8")).decode("ascii")
@@ -309,13 +299,15 @@ jobs:
                   gha_error(f"Could not commit fix to {repo_name}: {err}")
                   return
 
-              # Ensure labels exist
+              # Ensure labels exist — log warning on failure, do not abort
               for label, color, desc in [
                   ("auto-sync",     "1d76db", "Automated synchronization PR"),
                   ("instructions",  "e4e669", "Copilot instruction file changes"),
               ]:
-                  gh("label", "create", "--repo", f"{ORG}/{repo_name}",
+                  lc, _, lerr = gh("label", "create", "--repo", f"{ORG}/{repo_name}",
                      "--force", "--name", label, "--color", color, "--description", desc)
+                  if lc != 0:
+                      gha_notice(f"Warning: could not create label '{label}' in {repo_name}: {lerr}")
 
               # Build PR body
               issue_lines = []
