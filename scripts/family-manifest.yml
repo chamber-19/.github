@@ -36,7 +36,7 @@ repos:
     category: tool
   - name: block-library
     profile_role: "Tauri 2 desktop DXF viewer with Google Drive catalog sync and SQLite local cache"
-    copilot_role: "Tauri 2 desktop DXF viewer (frontend-first because of Three.js)"
+    copilot_role: "Tauri 2 desktop DXF viewer with Google Drive catalog sync and SQLite local cache"
     stack: "Tauri 2.0, React, Three.js, Rust"
     category: tool
   - name: Foundry
