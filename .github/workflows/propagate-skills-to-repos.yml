@@ -6,12 +6,9 @@ name: Propagate Skills to Repos
 #
 # Does NOT copy skill files — only fixes references and pointers.
 #
-# Required repo secrets (chamber-19/.github → Settings → Secrets):
+# Required org secrets:
 #   - SKILLS_SYNC_APP_ID          — GitHub App ID for chamber-19-skill-sync
 #   - SKILLS_SYNC_APP_PRIVATE_KEY — Private key for chamber-19-skill-sync
-#
-# The same app is already installed in chamber-19/autocad-knowledge.
-# Add it to chamber-19/.github with the same values to enable this workflow.
 
 on:
   push:
@@ -44,7 +41,7 @@ jobs:
           [[ -z "$_APP_KEY" ]] && missing+=("SKILLS_SYNC_APP_PRIVATE_KEY")
           if [[ ${#missing[@]} -gt 0 ]]; then
             for s in "${missing[@]}"; do
-              echo "::error::Required secret is not set: ${s}. Add it as a repo secret in chamber-19/.github."
+              echo "::error::Required secret is not set: ${s}."
             done
             exit 1
           fi
@@ -63,7 +60,6 @@ jobs:
           SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
           echo "short_sha=${SHORT_SHA}" >> "$GITHUB_OUTPUT"
 
-          # Collect existing skill file basenames (case-insensitive .md)
           python3 - <<'PY'
           import os, json
           skill_dir = "docs/skills"
@@ -95,16 +91,12 @@ jobs:
           TRIGGER_SHA = os.environ["TRIGGER_SHA"]
           TRIGGER_REPO = os.environ["TRIGGER_REPO"]
 
-          # Repos to skip (source-of-truth and non-code repos).
-          # Update this set when new source-of-truth repos are added to the org.
           SKIP_REPOS = {".github", "autocad-knowledge", "org-maintenance"}
 
-          # Existing skill names (uppercase, no extension)
           SKILL_NAMES = set(
               s.strip() for s in os.environ["SKILL_NAMES"].splitlines() if s.strip()
           )
 
-          # Stack → required skill basenames (uppercase, no extension)
           STACK_SKILL_MAP = {
               "Rust":      "RUST",
               "Python":    "PYTHON",
@@ -112,7 +104,6 @@ jobs:
               "Excel VBA": "VBA_EXCEL",
               "DOCX":      "DOCX",
           }
-          # AutoCAD .NET is required only for repos whose name signals AutoCAD/MCP work
           AUTOCAD_REPOS = {"batch-fnr", "chamber-19-autocad-mcp"}
 
           def gh(*args):
@@ -129,7 +120,6 @@ jobs:
               print(f"::error::{msg}", flush=True)
 
           def get_file(repo_name, path):
-              """Return (content_str, sha) or (None, None) if not found."""
               code, out, err = gh(
                   "api", f"/repos/{ORG}/{repo_name}/contents/{path}",
                   "--jq", "[.content, .sha] | @json"
@@ -140,28 +130,19 @@ jobs:
                   parsed = json.loads(out)
                   if isinstance(parsed, str):
                       parsed = json.loads(parsed)
-                  parts = parsed
-                  raw_b64 = parts[0].replace("\n", "")
+                  raw_b64 = parsed[0].replace("\n", "")
                   content = base64.b64decode(raw_b64).decode("utf-8")
-                  return content, parts[1]
+                  return content, parsed[1]
               except Exception:
                   return None, None
 
           def check_instructions(content, stack, repo_name):
-              """Return list of issue dicts describing drift found."""
               issues = []
-
-              # Check for stale docs/skills/ references (skill no longer exists)
               for m in re.finditer(r"docs/skills/([A-Za-z0-9_.+-]+)\.md", content, re.IGNORECASE):
                   ref_name = os.path.splitext(m.group(1))[0].upper()
                   if ref_name not in SKILL_NAMES:
-                      issues.append({
-                          "type": "stale_ref",
-                          "path": m.group(0),
-                          "name": ref_name,
-                      })
+                      issues.append({"type": "stale_ref", "path": m.group(0), "name": ref_name})
 
-              # Determine required skills from stack
               required = set()
               for stack_token, skill in STACK_SKILL_MAP.items():
                   if stack_token.lower() in stack.lower():
@@ -169,17 +150,15 @@ jobs:
               if repo_name in AUTOCAD_REPOS:
                   required.add("AUTOCAD_DOTNET")
 
-              # Check which required skills are missing
               for skill in sorted(required):
                   if skill not in SKILL_NAMES:
-                      continue  # skill doesn't exist org-side, skip
+                      continue
                   if not re.search(rf"docs/skills/{re.escape(skill)}\.md", content, re.IGNORECASE):
                       issues.append({"type": "missing_ref", "skill": skill})
 
               return issues
 
           def skill_ref_line(skill_name, skill_file):
-              """Return the standard skill reference bullet for a given skill."""
               label = "AutoCAD .NET" if skill_name == "AUTOCAD_DOTNET" else skill_name.replace("_", " ").title()
               return (
                   f"- Read [`docs/skills/{skill_file}`]"
@@ -188,29 +167,19 @@ jobs:
               )
 
           def find_skill_file(skill_name):
-              """Return the actual filename for a skill (preserving original casing), or None."""
               for f in os.listdir("docs/skills"):
                   if os.path.splitext(f)[0].upper() == skill_name:
                       return f
               return None
 
           def build_fixed_content(original, issues, stack, repo_name):
-              """
-              Return corrected content.
-              - Removes all occurrences of stale docs/skills/ paths.
-              - Appends missing required skill references at the end.
-              - Preserves all existing custom content.
-              """
               content = original
-
-              # Replace all occurrences of each stale skill reference
               for issue in issues:
                   if issue["type"] == "stale_ref":
                       stale_path = issue["path"]
                       replacement = f"<!-- removed stale ref: {stale_path} (skill no longer exists) -->"
                       content = re.sub(re.escape(stale_path), replacement, content)
 
-              # Collect skills to add
               to_add = [i["skill"] for i in issues if i["type"] == "missing_ref"]
               if to_add:
                   additions = []
@@ -218,7 +187,6 @@ jobs:
                       sf = find_skill_file(skill)
                       if sf:
                           additions.append(skill_ref_line(skill, sf))
-
                   if additions:
                       block = "\n\n<!-- Added by chamber-19-skill-sync — required skill references for this repo's stack -->\n"
                       block += "\n".join(additions) + "\n"
@@ -227,7 +195,6 @@ jobs:
               return content
 
           def build_minimal_instructions(repo_name, stack):
-              """Generate a minimal copilot-instructions.md for repos that have none."""
               lines = [
                   "<!-- markdownlint-disable MD013 -->",
                   f"# Copilot Instructions — {repo_name}",
@@ -236,7 +203,6 @@ jobs:
                   "> loads automatically alongside this file. Rules here are repo-specific additions.",
                   "",
               ]
-
               refs = []
               for stack_token, skill in STACK_SKILL_MAP.items():
                   if stack_token.lower() in stack.lower() and skill in SKILL_NAMES:
@@ -247,13 +213,11 @@ jobs:
                   sf = find_skill_file("AUTOCAD_DOTNET")
                   if sf:
                       refs.append(skill_ref_line("AUTOCAD_DOTNET", sf))
-
               if refs:
                   lines.append("## Required reading")
                   lines.append("")
                   lines.extend(refs)
                   lines.append("")
-
               return "\n".join(lines)
 
           def branch_exists(repo_name, branch):
@@ -261,7 +225,6 @@ jobs:
               return code == 0
 
           def open_pr(repo_name, branch, default_branch, file_path, file_sha, new_content, issues, is_new_file):
-              # Resolve HEAD SHA directly from the branch ref
               code, out, _ = gh(
                   "api", f"/repos/{ORG}/{repo_name}/git/ref/heads/{default_branch}",
                   "--jq", ".object.sha"
@@ -272,9 +235,7 @@ jobs:
 
               base_sha = out.strip()
 
-              # Check branch existence before attempting to create it
-              br_exists = branch_exists(repo_name, branch)
-              if not br_exists:
+              if not branch_exists(repo_name, branch):
                   code, _, err = gh(
                       "api", f"/repos/{ORG}/{repo_name}/git/refs",
                       "--method", "POST",
@@ -285,7 +246,6 @@ jobs:
                       gha_error(f"Could not create branch {branch} in {repo_name}: {err}")
                       return
 
-              # Commit the fixed file
               encoded = base64.b64encode(new_content.encode("utf-8")).decode("ascii")
               commit_args = [
                   "api", f"/repos/{ORG}/{repo_name}/contents/{file_path}",
@@ -301,17 +261,21 @@ jobs:
                   gha_error(f"Could not commit fix to {repo_name}: {err}")
                   return
 
-              # Ensure labels exist — log warning on failure, do not abort
+              # Ensure labels exist — name is a positional arg, not --name
               for label, color, desc in [
-                  ("auto-sync",     "1d76db", "Automated synchronization PR"),
-                  ("instructions",  "e4e669", "Copilot instruction file changes"),
+                  ("auto-sync",    "1d76db", "Automated synchronization PR"),
+                  ("instructions", "e4e669", "Copilot instruction file changes"),
               ]:
-                  lc, _, lerr = gh("label", "create", "--repo", f"{ORG}/{repo_name}",
-                     "--force", "--name", label, "--color", color, "--description", desc)
+                  lc, _, lerr = gh(
+                      "label", "create", label,
+                      "--repo", f"{ORG}/{repo_name}",
+                      "--force",
+                      "--color", color,
+                      "--description", desc,
+                  )
                   if lc != 0:
                       gha_notice(f"Warning: could not create label '{label}' in {repo_name}: {lerr}")
 
-              # Build PR body
               issue_lines = []
               for issue in issues:
                   if issue["type"] == "stale_ref":
@@ -343,6 +307,7 @@ jobs:
               with open(pr_body_path, "w") as f:
                   f.write(pr_body)
 
+              # Open PR without labels first — labels are best-effort
               code, out, err = gh(
                   "pr", "create",
                   "--repo", f"{ORG}/{repo_name}",
@@ -350,12 +315,25 @@ jobs:
                   "--head", branch,
                   "--title", "chore(instructions): sync Copilot instructions with org skill updates",
                   "--body-file", pr_body_path,
-                  "--label", "auto-sync,instructions",
               )
-              if code == 0:
-                  gha_notice(f"Opened PR in {repo_name}: {out.strip()}")
-              else:
+              if code != 0:
                   gha_error(f"Failed to open PR in {repo_name}: {err}")
+                  return
+
+              pr_url = out.strip()
+              gha_notice(f"Opened PR in {repo_name}: {pr_url}")
+
+              # Extract PR number and apply labels separately so label failures don't block
+              pr_num_match = re.search(r"/pull/(\d+)", pr_url)
+              if pr_num_match:
+                  pr_number = pr_num_match.group(1)
+                  lc, _, lerr = gh(
+                      "pr", "edit", pr_number,
+                      "--repo", f"{ORG}/{repo_name}",
+                      "--add-label", "auto-sync,instructions",
+                  )
+                  if lc != 0:
+                      gha_notice(f"Warning: could not apply labels to PR {pr_number} in {repo_name}: {lerr}")
 
           # --- Main loop ---
           import yaml
@@ -363,7 +341,7 @@ jobs:
               with open("scripts/family-manifest.yml") as f:
                   manifest = yaml.safe_load(f)
           except (OSError, yaml.YAMLError) as exc:
-              print(f"::error::Could not load family manifest from scripts/family-manifest.yml — ensure it exists and is valid YAML. Error: {exc}", flush=True)
+              print(f"::error::Could not load family manifest: {exc}", flush=True)
               sys.exit(1)
 
           for repo_entry in manifest["repos"]:
@@ -372,14 +350,13 @@ jobs:
               status = repo_entry.get("status", "active")
 
               if repo_name in SKIP_REPOS:
-                  gha_notice(f"Skipping {repo_name} — in skip list (source of truth or non-code repo)")
+                  gha_notice(f"Skipping {repo_name} — in skip list")
                   continue
 
               if status == "archived":
                   gha_notice(f"Skipping {repo_name} — archived")
                   continue
 
-              # Check if repo is a fork
               code, repo_json, _ = gh("api", f"/repos/{ORG}/{repo_name}", "--jq", "[.fork, .archived, .default_branch] | @json")
               if code != 0:
                   gha_notice(f"Skipping {repo_name} — repo not accessible or does not exist")
@@ -389,8 +366,7 @@ jobs:
                   parsed = json.loads(repo_json)
                   if isinstance(parsed, str):
                       parsed = json.loads(parsed)
-                  repo_meta = parsed
-                  is_fork, is_archived, default_branch = repo_meta
+                  is_fork, is_archived, default_branch = parsed
               except Exception:
                   gha_notice(f"Skipping {repo_name} — could not parse repo metadata")
                   continue
@@ -405,7 +381,6 @@ jobs:
               instructions_path = ".github/copilot-instructions.md"
               content, file_sha = get_file(repo_name, instructions_path)
 
-              # Check if a PR for this branch already exists
               code, existing, _ = gh(
                   "api",
                   f"/repos/{ORG}/{repo_name}/pulls",
