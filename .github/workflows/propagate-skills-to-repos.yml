@@ -19,8 +19,8 @@ on:
     paths:
       - 'docs/skills/**'
       - 'docs/agents/**'
-      - 'instructions/**'
-      - 'copilot-instructions.md'
+      - '.github/instructions/**'
+      - '.github/copilot-instructions.md'
   workflow_dispatch:
 
 permissions:
