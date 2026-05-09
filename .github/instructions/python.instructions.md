@@ -1,5 +1,5 @@
 ---
-applyTo: "**/*.py,**/requirements.txt,**/pyproject.toml"
+applyTo: "**/*.py, **/requirements.txt, **/pyproject.toml"
 ---
 
 # Python sidecar rules

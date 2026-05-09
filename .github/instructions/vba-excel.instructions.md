@@ -1,5 +1,5 @@
 ---
-applyTo: "**/*.bas,**/*.cls,**/*.frm,**/*.xlsm,**/*.xls"
+applyTo: "**/*.bas, **/*.cls, **/*.frm, **/*.xlsm, **/*.xls"
 ---
 
 # VBA/Excel automation rules

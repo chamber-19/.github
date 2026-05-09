@@ -139,29 +139,43 @@ foreach ($markdownFile in $markdownFiles) {
 # Check C — required family table entries in org copilot instructions
 $orgInstructionsPath = Join-Path $RepoRoot ".github/copilot-instructions.md"
 $orgLines = Get-FileLines -FilePath $orgInstructionsPath
-$familyTableStartLine = 37
-
-$hasExpectedBlockLibraryRow = $false
-foreach ($line in $orgLines) {
-    if ($line.Contains('`block-library`') -and $line.Contains("Google Drive catalog sync and SQLite local cache") -and $line.Contains("Tauri 2.0, React, Three.js, Rust")) {
-        $hasExpectedBlockLibraryRow = $true
+$familyTableStartLine = 1
+for ($i = 0; $i -lt $orgLines.Count; $i++) {
+    if ($orgLines[$i].Trim() -eq "## Family table") {
+        $familyTableStartLine = $i + 1
         break
     }
 }
 
-if (-not $hasExpectedBlockLibraryRow) {
-    Add-ErrorAnnotation -FilePath $orgInstructionsPath -Line $familyTableStartLine -Message "Family table must include the expected block-library description and stack."
-}
-
-$hasAutoCadMcpRow = $false
-foreach ($line in $orgLines) {
-    if ($line.Contains('`chamber-19-autocad-mcp`')) {
-        $hasAutoCadMcpRow = $true
+$blockLibraryLineNumber = -1
+for ($i = 0; $i -lt $orgLines.Count; $i++) {
+    if ($orgLines[$i].Contains('`block-library`')) {
+        $blockLibraryLineNumber = $i + 1
         break
     }
 }
 
-if (-not $hasAutoCadMcpRow) {
+if ($blockLibraryLineNumber -lt 0) {
+    Add-ErrorAnnotation -FilePath $orgInstructionsPath -Line $familyTableStartLine -Message "Family table must include a block-library row."
+}
+else {
+    $blockLibraryLine = $orgLines[$blockLibraryLineNumber - 1]
+    $hasExpectedPurpose = $blockLibraryLine.Contains("Tauri 2 desktop DXF viewer") -and $blockLibraryLine.Contains("Google Drive catalog sync") -and $blockLibraryLine.Contains("SQLite local cache")
+    $hasExpectedStack = $blockLibraryLine.Contains("Tauri 2.0, React, Three.js, Rust")
+    if (-not ($hasExpectedPurpose -and $hasExpectedStack)) {
+        Add-ErrorAnnotation -FilePath $orgInstructionsPath -Line $blockLibraryLineNumber -Message "block-library row must describe the DXF viewer purpose and include stack: Tauri 2.0, React, Three.js, Rust."
+    }
+}
+
+$autoCadMcpLineNumber = -1
+for ($i = 0; $i -lt $orgLines.Count; $i++) {
+    if ($orgLines[$i].Contains('`chamber-19-autocad-mcp`')) {
+        $autoCadMcpLineNumber = $i + 1
+        break
+    }
+}
+
+if ($autoCadMcpLineNumber -lt 0) {
     Add-ErrorAnnotation -FilePath $orgInstructionsPath -Line $familyTableStartLine -Message "Family table must include the chamber-19-autocad-mcp repository."
 }
 

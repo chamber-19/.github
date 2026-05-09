@@ -1,5 +1,5 @@
 ---
-applyTo: "**/*.rs,/src-tauri/,**/tauri.conf.json,/capabilities/"
+applyTo: "**/*.rs, /src-tauri/, **/tauri.conf.json, /capabilities/"
 ---
 
 # Tauri rules (Rust + IPC layer)
