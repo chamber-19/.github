@@ -36,6 +36,7 @@ into the workflow.
 
 ## Family table
 
+<!-- family-table:start -->
 | Repo | Purpose | Primary stack |
 |---|---|---|
 | `.github` | Org-wide config, shared instructions, skill files, memory, evals | Markdown, YAML |
@@ -48,6 +49,7 @@ into the workflow.
 | `batch-fnr` | Batch DXF Find-and-Replace — Tauri 2 desktop app with headless .NET AutoCAD sidecar | Tauri 2.0, Rust, React, .NET |
 | `IFA-IFC-Checklist` | Macro-enabled Excel workbook for IFA/IFC pre-submittal checklists with ribbon buttons and PDF export | VBA, Excel |
 | `block-library` | Tauri 2 desktop DXF viewer with Google Drive catalog sync and SQLite local cache | Tauri 2.0, React, Three.js, Rust |
+<!-- family-table:end -->
 
 Consumer apps (`transmittal-builder`, `Drawing-List-Manager`, `launcher`)
 pin `desktop-toolkit` in both ecosystems: `@chamber-19/desktop-toolkit`
