@@ -42,6 +42,7 @@ files across the org. Read the relevant skill before making changes:
 | `VBA_EXCEL.md` | VBA macros for IFA-IFC-Checklist |
 | `MARKDOWN.md` | Any `.md` file in the org |
 | `DOCX.md` | Word document generation (transmittal-builder) |
+| `AUTOCAD_INTERPRETIVE_DANCE.md` | [adversarial-test] Broken skill link — resolves to `docs/skills/AUTOCAD_INTERPRETIVE_DANCE.md` which does not exist |
 
 ## Contributing
 
