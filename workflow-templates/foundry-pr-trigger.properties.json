@@ -1,0 +1,6 @@
+{
+  "name": "Foundry PR Review Trigger",
+  "description": "Sends PR metadata to Foundry over Tailscale for reviewer-lane processing. Requires TS_OAUTH_CLIENT_ID, TS_OAUTH_SECRET, and FOUNDRY_BEARER_TOKEN org secrets.",
+  "iconName": "octicon-shield-check",
+  "categories": ["Automation"]
+}

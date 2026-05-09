@@ -1,0 +1,190 @@
+# Foundry PR Review Trigger — workflow template
+#
+# Copy this file into a consumer repo under .github/workflows/ to enable
+# Foundry's reviewer lane for every PR in that repo.
+#
+# Alternatively, if this file is also published at
+# .github/workflows/foundry-pr-trigger.yml in chamber-19/.github, consumer
+# repos may call it as a reusable workflow via:
+#   uses: chamber-19/.github/.github/workflows/foundry-pr-trigger.yml@main
+#
+# chamber-19/.github is the org-level repo — skills, agents, and Copilot
+# instructions defined here are automatically inherited by all repos in the org.
+#
+# Prerequisites on the Foundry machine:
+#   - TailscaleEnabled must be set to true in foundry.settings.json for inbound
+#     connections to be accepted on the reviewer lane port.
+#   - FOUNDRY_BEARER_TOKEN must match the bearerToken in Foundry's settings.
+#
+# Required org secrets (configure in GitHub org settings → Secrets):
+#   - TS_OAUTH_CLIENT_ID   — Tailscale OAuth client ID
+#   - TS_OAUTH_SECRET      — Tailscale OAuth secret
+#   - FOUNDRY_BEARER_TOKEN — bearer token for Foundry's reviewer lane API
+
+name: Foundry PR Review Trigger
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  trigger-foundry-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Validate required secrets
+        env:
+          _TS_CLIENT_ID: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          _TS_SECRET: ${{ secrets.TS_OAUTH_SECRET }}
+          _FOUNDRY_TOKEN: ${{ secrets.FOUNDRY_BEARER_TOKEN }}
+        run: |
+          missing=()
+          [[ -z "$_TS_CLIENT_ID" ]]  && missing+=("TS_OAUTH_CLIENT_ID")
+          [[ -z "$_TS_SECRET" ]]     && missing+=("TS_OAUTH_SECRET")
+          [[ -z "$_FOUNDRY_TOKEN" ]] && missing+=("FOUNDRY_BEARER_TOKEN (must match bearerToken in Foundry settings)")
+          if [[ ${#missing[@]} -gt 0 ]]; then
+            for s in "${missing[@]}"; do
+              echo "::error::Required secret is not set: ${s}"
+            done
+            exit 1
+          fi
+
+      - name: Join Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:gh-runner
+          ephemeral: true
+
+      - name: Notice — manual dispatch, no PR to process
+        if: github.event_name == 'workflow_dispatch'
+        run: echo "::notice::workflow_dispatch — Tailscale connectivity verified. No PR metadata to collect."
+
+      - name: Collect PR metadata
+        id: meta
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          REPO="${{ github.repository }}"
+          BASE_REF="${{ github.base_ref }}"
+          ACTOR="${{ github.actor }}"
+
+          PR_JSON=$(gh pr view "$PR_NUMBER" \
+            --repo "$REPO" \
+            --json title,body,number,author,labels)
+
+          PR_TITLE=$(echo "$PR_JSON" | jq -r '.title')
+          PR_BODY=$(echo "$PR_JSON" | jq -r '.body // ""')
+          PR_AUTHOR=$(echo "$PR_JSON" | jq -r '.author.login')
+
+          # Diff stat — fetch base branch tip for three-dot comparison
+          git fetch origin "${BASE_REF}" --depth=1 2>/dev/null || true
+          DIFF_STAT=$(git diff --stat "origin/${BASE_REF}...HEAD" 2>/dev/null || echo "")
+
+          # Dependency graph compare — gracefully skip on 404 or if not enabled
+          DEP_REVIEW_JSON=""
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+          if DEP_REVIEW=$(gh api "/repos/${REPO}/dependency-graph/compare/${BASE_SHA}...${HEAD_SHA}" 2>/dev/null); then
+            DEP_REVIEW_JSON=$(echo "$DEP_REVIEW" | jq -c '.')
+            echo "::notice::Dependency graph data collected for PR #${PR_NUMBER}"
+          else
+            echo "::notice::Dependency graph compare not available for ${REPO} — skipping dep review data"
+          fi
+
+          # Dependabot-specific field extraction
+          DEP_NAME=""
+          FROM_VERSION=""
+          TO_VERSION=""
+          ECOSYSTEM=""
+          if [[ "$ACTOR" == "dependabot[bot]" ]]; then
+            DEP_NAME=$(echo "$PR_TITLE" | grep -ioP '(?<=bump )[^\s]+(?= from)' | head -1 || true)
+            FROM_VERSION=$(echo "$PR_TITLE" | grep -ioP '(?<=from )[^\s]+(?= to)' | head -1 || true)
+            TO_VERSION=$(echo "$PR_TITLE" | grep -ioP '(?<= to )[^\s]+$' | head -1 || true)
+
+            LABEL_NAMES=$(echo "$PR_JSON" | jq -r '.labels[].name' | tr '\n' ' ')
+            if echo "$LABEL_NAMES" | grep -qi "npm\|javascript\|nodejs"; then
+              ECOSYSTEM="npm"
+            elif echo "$LABEL_NAMES" | grep -qi "cargo\|rust"; then
+              ECOSYSTEM="cargo"
+            elif echo "$LABEL_NAMES" | grep -qi "nuget\|\.net"; then
+              ECOSYSTEM="nuget"
+            elif echo "$LABEL_NAMES" | grep -qi "pip\|python"; then
+              ECOSYSTEM="pip"
+            elif echo "$LABEL_NAMES" | grep -qi "maven\|java"; then
+              ECOSYSTEM="maven"
+            fi
+
+            echo "::notice::Dependabot PR — package: ${DEP_NAME}, ${FROM_VERSION} → ${TO_VERSION}, ecosystem: ${ECOSYSTEM:-unknown}"
+          else
+            echo "::notice::Non-Dependabot PR — Foundry DepReviewerAgent will handle gracefully"
+          fi
+
+          # Build JSON payload with jq to ensure correct escaping
+          PAYLOAD=$(jq -n \
+            --arg repo "$REPO" \
+            --argjson prNumber "$PR_NUMBER" \
+            --arg prTitle "$PR_TITLE" \
+            --arg prBody "$PR_BODY" \
+            --arg dependencyName "$DEP_NAME" \
+            --arg fromVersion "$FROM_VERSION" \
+            --arg toVersion "$TO_VERSION" \
+            --arg ecosystem "$ECOSYSTEM" \
+            --arg dependencyReviewJson "$DEP_REVIEW_JSON" \
+            --arg diffStat "$DIFF_STAT" \
+            '{
+              repo: $repo,
+              prNumber: $prNumber,
+              prTitle: $prTitle,
+              prBody: $prBody,
+              dependencyName: $dependencyName,
+              fromVersion: $fromVersion,
+              toVersion: $toVersion,
+              ecosystem: $ecosystem,
+              dependencyReviewJson: $dependencyReviewJson,
+              diffStat: $diffStat
+            }')
+
+          printf '%s' "$PAYLOAD" > /tmp/foundry-payload.json
+          echo "Payload written — $(wc -c < /tmp/foundry-payload.json) bytes"
+
+      - name: POST to Foundry
+        if: github.event_name == 'pull_request'
+        run: |
+          RESPONSE=$(curl -s -w "\n%{http_code}" \
+            -X POST \
+            -H "Authorization: Bearer ${{ secrets.FOUNDRY_BEARER_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d @/tmp/foundry-payload.json \
+            "https://foundry.tail05ac8a.ts.net:57420/api/review/dependency-pr")
+
+          HTTP_BODY=$(echo "$RESPONSE" | head -n -1)
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n 1)
+
+          echo "Foundry response body: ${HTTP_BODY}"
+          echo "HTTP status: ${HTTP_CODE}"
+
+          JOB_ID=$(echo "$HTTP_BODY" | jq -r '.jobId // empty' 2>/dev/null || true)
+          [[ -n "$JOB_ID" ]] && echo "::notice::Foundry accepted review job — jobId: ${JOB_ID}"
+
+          if [[ "$HTTP_CODE" != "202" ]]; then
+            echo "::error::Foundry returned HTTP ${HTTP_CODE} — expected 202. Body: ${HTTP_BODY}"
+            exit 1
+          fi
+
+      - name: Leave Tailscale
+        if: always()
+        run: tailscale logout 2>/dev/null || true
