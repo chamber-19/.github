@@ -43,6 +43,7 @@ into the workflow.
 | `launcher` | Universal Tauri shell: desktop integration, app routing, activation gate, updates for all tools | Tauri 2.0, React, Rust |
 | `transmittal-builder` | Backend service: generates transmittal packages (scans folders, renders Word, merges PDFs) | Python FastAPI |
 | `Drawing-List-Manager` | Backend service: manages drawing registers (editing, revisions, validation) | Python FastAPI |
+| `batch-fnr` | Backend service: batch find and replace text across multiple AutoCAD DWG files | Python FastAPI, .NET 10 sidecar |
 | `Foundry` | Local agent broker: enqueues GitHub/Discord jobs, dispatches to Ollama, posts results | C# (.NET), Python, Ollama |
 | `autocad-knowledge` | Reference patterns and knowledge base for AutoCAD .NET plugins | C#, Markdown |
 | `IFA-IFC-Checklist` | Macro-enabled Excel workbook for IFA/IFC pre-submittal checklists with ribbon buttons and PDF export | VBA, Excel |
