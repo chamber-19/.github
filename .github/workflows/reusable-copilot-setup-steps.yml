@@ -79,8 +79,15 @@ jobs:
           scope: ${{ inputs.gh-packages-scope }}
 
       - name: Install Node dependencies
-        if: ${{ inputs.node }}
+        if: ${{ inputs.node && inputs.gh-packages-scope == '' }}
         working-directory: ${{ inputs.node-working-directory }}
+        run: npm ci
+
+      - name: Install Node dependencies (GitHub Packages)
+        if: ${{ inputs.node && inputs.gh-packages-scope != '' }}
+        working-directory: ${{ inputs.node-working-directory }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm ci
 
       - name: Setup Python
