@@ -21,6 +21,7 @@ on:
       - 'docs/agents/**'
       - '.github/instructions/**'
       - '.github/copilot-instructions.md'
+      - '.gitmodules'
   workflow_dispatch:
 
 permissions:
