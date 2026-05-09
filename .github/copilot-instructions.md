@@ -47,7 +47,14 @@ into the workflow.
 | `Foundry` | Local agent broker: enqueues GitHub/Discord jobs, dispatches to Ollama, posts results | C# (.NET), Python, Ollama |
 | `autocad-knowledge` | Reference patterns and knowledge base for AutoCAD .NET plugins | C#, Markdown |
 | `IFA-IFC-Checklist` | Macro-enabled Excel workbook for IFA/IFC pre-submittal checklists with ribbon buttons and PDF export | VBA, Excel |
-| `block-library` | Tauri 2 desktop DXF viewer with Google Drive catalog sync and SQLite local cache | Tauri 2.0, React, Three.js, Rust |
+| `block-library` | **UI-first:** Tauri 2 desktop DXF viewer with Google Drive catalog sync and SQLite local cache | Tauri 2.0, React, Three.js, Rust |
+
+**Architecture notes:**
+
+- **Backend-first apps** (`transmittal-builder`, `Drawing-List-Manager`, `batch-fnr`): Stateless REST services on localhost, routed through launcher
+- **UI-first apps** (`block-library`): Desktop-native Tauri apps with rich UI (3D rendering, interactive state). Kept in production deployment due to GPU/rendering requirements
+- **Shared framework** (`desktop-toolkit`): Powers both backend routing (activation service) and desktop shells
+- **Launcher** (`launcher`): Universal Tauri shell that routes to all backend services and coordinates updates
 
 Consumer apps (`transmittal-builder`, `Drawing-List-Manager`, `launcher`)
 pin `desktop-toolkit` in both ecosystems: `@chamber-19/desktop-toolkit`
