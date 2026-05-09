@@ -1,9 +1,8 @@
-applyTo:
+---
+applyTo: "**/*.py,**/requirements.txt,**/pyproject.toml"
+---
 
-"**/*.py"
-"**/requirements.txt"
-"**/pyproject.toml"
-Python sidecar rules
+# Python sidecar rules
 
 Python sidecars power our back‑end APIs and interact with AutoCAD via COM where necessary. To ensure predictable behaviour, adhere to these rules:
 

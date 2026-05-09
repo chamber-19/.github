@@ -45,6 +45,7 @@ into the workflow.
 | `Drawing-List-Manager` | Manages project drawing registers with editing, revision advancement, and validation | Tauri 2.0, Python FastAPI sidecar, React |
 | `Foundry` | Local agent broker — enqueues jobs from GitHub and Discord, dispatches to Ollama, posts structured results back | C# (.NET), Python, Ollama |
 | `autocad-knowledge` | Reference patterns and knowledge base for AutoCAD .NET plugins | C#, Markdown |
+| `chamber-19-autocad-mcp` | AutoCAD .NET plugin that hosts an MCP server inside `acad.exe` for client-driven drafting queries | C# (.NET), AutoCAD .NET, MCP |
 | `batch-fnr` | Batch DXF Find-and-Replace — Tauri 2 desktop app with headless .NET AutoCAD sidecar | Tauri 2.0, Rust, React, .NET |
 | `IFA-IFC-Checklist` | Macro-enabled Excel workbook for IFA/IFC pre-submittal checklists with ribbon buttons and PDF export | VBA, Excel |
 | `block-library` | Tauri 2 desktop DXF viewer with Google Drive catalog sync and SQLite local cache | Tauri 2.0, React, Three.js, Rust |

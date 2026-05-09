@@ -1,9 +1,8 @@
-applyTo:
+---
+applyTo: "**/*.rs,**/Cargo.toml,**/Cargo.lock"
+---
 
-"**/*.rs"
-"**/Cargo.toml"
-"**/Cargo.lock"
-Rust rules
+# Rust rules
 
 Rust is the backbone of our Tauri applications and .NET interop. The following guidelines are mandatory:
 

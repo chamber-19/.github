@@ -1,10 +1,8 @@
-applyTo:
+---
+applyTo: "**/*.rs,/src-tauri/,**/tauri.conf.json,/capabilities/"
+---
 
-"**/*.rs"
-"/src-tauri/"
-"**/tauri.conf.json"
-"/capabilities/"
-Tauri rules (Rust + IPC layer)
+# Tauri rules (Rust + IPC layer)
 
 The following patterns are mandatory for all Rust code and configuration files used in a Tauri application:
 
