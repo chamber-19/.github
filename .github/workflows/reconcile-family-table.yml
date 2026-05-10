@@ -1,0 +1,177 @@
+name: Reconcile Family Table
+
+on:
+  schedule:
+    - cron: "0 8 * * 1"
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - scripts/family-manifest.yml
+      - scripts/reconcile-family-table.ps1
+      - .github/workflows/reconcile-family-table.yml
+  pull_request:
+    paths:
+      - profile/README.md
+      - .github/copilot-instructions.md
+      - scripts/family-manifest.yml
+      - scripts/reconcile-family-table.ps1
+      - .github/workflows/reconcile-family-table.yml
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  reconcile:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Reconcile family tables
+        shell: pwsh
+        run: pwsh -File scripts/reconcile-family-table.ps1
+
+      - name: Detect drift
+        id: drift
+        shell: bash
+        run: |
+          if git diff --quiet -- profile/README.md .github/copilot-instructions.md; then
+            echo "has_drift=false" >> "$GITHUB_OUTPUT"
+            echo "no drift"
+          else
+            echo "has_drift=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Ensure labels exist
+        if: steps.drift.outputs.has_drift == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const labels = [
+              { name: "family-table", color: "0e8a16", description: "Family table reconciliation changes" },
+              { name: "auto-sync", color: "1d76db", description: "Automated synchronization PR" }
+            ];
+
+            for (const label of labels) {
+              try {
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: label.name,
+                  color: label.color,
+                  description: label.description
+                });
+                core.info(`Created label ${label.name}`);
+              } catch (error) {
+                if (error.status === 422) {
+                  core.info(`Label ${label.name} already exists`);
+                } else {
+                  throw error;
+                }
+              }
+            }
+
+      - name: Build PR summary
+        if: steps.drift.outputs.has_drift == 'true'
+        id: summary
+        shell: bash
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+
+          START = "<!-- family-table:start -->"
+          END = "<!-- family-table:end -->"
+          FILES = ["profile/README.md", ".github/copilot-instructions.md"]
+
+          def table_rows(content: str):
+              match = re.search(re.escape(START) + r"\n(.*?)\n" + re.escape(END), content, re.S)
+              if not match:
+                  return {}
+              rows = {}
+              for line in match.group(1).splitlines():
+                  stripped = line.strip()
+                  if not stripped.startswith("|"):
+                      continue
+                  if stripped.startswith("|---"):
+                      continue
+                  if "| Repo |" in stripped:
+                      continue
+                  key = stripped.split("|", 2)[1].strip()
+                  rows[key] = stripped
+              return rows
+
+          def summarize(path: str):
+              current = Path(path).read_text(encoding="utf-8")
+              previous = __import__("subprocess").check_output(
+                  ["git", "show", f"HEAD:{path}"], text=True
+              )
+              old_rows = table_rows(previous)
+              new_rows = table_rows(current)
+
+              old_keys = set(old_rows)
+              new_keys = set(new_rows)
+
+              added = sorted(new_keys - old_keys)
+              removed = sorted(old_keys - new_keys)
+              modified = sorted(k for k in old_keys & new_keys if old_rows[k] != new_rows[k])
+              return added, removed, modified
+
+          lines = [
+              "## Family table reconciliation",
+              "",
+              "This PR was generated from `scripts/family-manifest.yml` against live repository metadata.",
+              ""
+          ]
+
+          for file_path in FILES:
+              added, removed, modified = summarize(file_path)
+              lines.append(f"### `{file_path}`")
+              lines.append(f"- Added rows: {', '.join(added) if added else 'none'}")
+              lines.append(f"- Removed rows: {', '.join(removed) if removed else 'none'}")
+              lines.append(f"- Modified rows: {', '.join(modified) if modified else 'none'}")
+              lines.append("")
+
+          body = "\n".join(lines).strip() + "\n"
+          with open(__import__("os").environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as fh:
+              fh.write("body<<EOF\n")
+              fh.write(body)
+              fh.write("EOF\n")
+          PY
+
+      - name: Build branch name
+        if: steps.drift.outputs.has_drift == 'true'
+        id: branch
+        shell: bash
+        run: echo "name=auto/family-table-sync-$(date -u +%Y%m%d)" >> "$GITHUB_OUTPUT"
+
+      - name: Open or update PR
+        if: steps.drift.outputs.has_drift == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ github.token }}
+          branch: ${{ steps.branch.outputs.name }}
+          commit-message: "chore(family-table): reconcile from live repo metadata"
+          title: "chore(family-table): reconcile from live repo metadata"
+          body: ${{ steps.summary.outputs.body }}
+          labels: "family-table,auto-sync"
+          add-paths: |
+            profile/README.md
+            .github/copilot-instructions.md
+
+  smoke-test:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Reconciler dry run
+        shell: pwsh
+        run: pwsh -File scripts/reconcile-family-table.ps1 -DryRun -Check

@@ -36,7 +36,8 @@ into the workflow.
 
 ## Family table
 
-| Repo | Purpose | Primary stack |
+<!-- family-table:start -->
+| Repo | Role | Stack |
 |---|---|---|
 | `.github` | Org-wide config, shared instructions, skill files, memory, evals | Markdown, YAML |
 | `desktop-toolkit` | Shared framework: Tauri primitives, sidecar boilerplate, NSIS installer, CI templates, **activation service** | Rust, Tauri 2.0, React, Python, FastAPI |
@@ -55,6 +56,18 @@ into the workflow.
 - **UI-first apps** (`block-library`): Desktop-native Tauri apps with rich UI (3D rendering, interactive state). Kept in production deployment due to GPU/rendering requirements
 - **Shared framework** (`desktop-toolkit`): Powers both backend routing (activation service) and desktop shells
 - **Launcher** (`launcher`): Universal Tauri shell that routes to all backend services and coordinates updates
+| `desktop-toolkit` | Shared framework for Tauri desktop apps | Tauri 2.0, React, Rust, Python |
+| `launcher` | Desktop launcher and updater — activation, app routing, updater | Tauri 2.0, React, Rust |
+| `transmittal-builder` | Tauri app with Python sidecar — engineering transmittal package generator | Tauri 2.0, Rust, Python |
+| `Drawing-List-Manager` | Tauri app with Python sidecar — project drawing register | Tauri 2.0, Rust |
+| `batch-fnr` | Batch DXF Find-and-Replace with headless .NET AutoCAD sidecar | Tauri 2.0, Rust, React, .NET |
+| `block-library` | Tauri 2 desktop DXF viewer with Google Drive catalog sync and SQLite local cache | Tauri 2.0, React, Three.js, Rust |
+| `Foundry` | Local agent broker — Ollama-backed dep-reviewer and other agents | .NET, Ollama, Microsoft.SemanticKernel |
+| `autocad-knowledge` | AutoCAD .NET pattern reference — source of truth for AUTOCAD_DOTNET.md skill | Markdown, C# samples |
+| `chamber-19-autocad-mcp` | MCP server inside AutoCAD — read-only inspection surface for LLM agents | .NET, PowerShell |
+| `IFA-IFC-Checklist` | Macro-enabled Excel workbook for IFA/IFC pre-submittal checklists | Excel VBA |
+| `.github` | TODO: curate role copy for this repo in family-table generation | Markdown, YAML |
+<!-- family-table:end -->
 
 Consumer apps (`transmittal-builder`, `Drawing-List-Manager`, `launcher`)
 pin `desktop-toolkit` in both ecosystems: `@chamber-19/desktop-toolkit`

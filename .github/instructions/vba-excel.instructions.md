@@ -1,11 +1,8 @@
-applyTo:
+---
+applyTo: "**/*.bas, **/*.cls, **/*.frm, **/*.xlsm, **/*.xls"
+---
 
-"**/*.bas"
-"**/*.cls"
-"**/*.frm"
-"**/*.xlsm"
-"**/*.xls"
-VBA/Excel automation rules
+# VBA/Excel automation rules
 
 The IFA‑IFC‑Checklist workbook uses VBA macros to validate engineering submittals. The following rules ensure safe automation:
 
