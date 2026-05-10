@@ -39,6 +39,23 @@ into the workflow.
 <!-- family-table:start -->
 | Repo | Role | Stack |
 |---|---|---|
+| `.github` | Org-wide config, shared instructions, skill files, memory, evals | Markdown, YAML |
+| `desktop-toolkit` | Shared framework: Tauri primitives, sidecar boilerplate, NSIS installer, CI templates, **activation service** | Rust, Tauri 2.0, React, Python, FastAPI |
+| `launcher` | Universal Tauri shell: desktop integration, app routing, activation gate, updates for all tools | Tauri 2.0, React, Rust |
+| `transmittal-builder` | Backend service: generates transmittal packages (scans folders, renders Word, merges PDFs) | Python FastAPI |
+| `Drawing-List-Manager` | Backend service: manages drawing registers (editing, revisions, validation) | Python FastAPI |
+| `batch-fnr` | Backend service: batch find and replace text across multiple AutoCAD DWG files | Python FastAPI, .NET 10 sidecar |
+| `Foundry` | Local agent broker: enqueues GitHub/Discord jobs, dispatches to Ollama, posts results | C# (.NET), Python, Ollama |
+| `autocad-knowledge` | Reference patterns and knowledge base for AutoCAD .NET plugins | C#, Markdown |
+| `IFA-IFC-Checklist` | Macro-enabled Excel workbook for IFA/IFC pre-submittal checklists with ribbon buttons and PDF export | VBA, Excel |
+| `block-library` | **UI-first:** Tauri 2 desktop DXF viewer with Google Drive catalog sync and SQLite local cache | Tauri 2.0, React, Three.js, Rust |
+
+**Architecture notes:**
+
+- **Backend-first apps** (`transmittal-builder`, `Drawing-List-Manager`, `batch-fnr`): Stateless REST services on localhost, routed through launcher
+- **UI-first apps** (`block-library`): Desktop-native Tauri apps with rich UI (3D rendering, interactive state). Kept in production deployment due to GPU/rendering requirements
+- **Shared framework** (`desktop-toolkit`): Powers both backend routing (activation service) and desktop shells
+- **Launcher** (`launcher`): Universal Tauri shell that routes to all backend services and coordinates updates
 | `desktop-toolkit` | Shared framework for Tauri desktop apps | Tauri 2.0, React, Rust, Python |
 | `launcher` | Desktop launcher and updater — activation, app routing, updater | Tauri 2.0, React, Rust |
 | `transmittal-builder` | Tauri app with Python sidecar — engineering transmittal package generator | Tauri 2.0, Rust, Python |

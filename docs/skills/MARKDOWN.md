@@ -199,25 +199,28 @@ contains real code.
 
 ```markdown
 # Good — single command, clear intent
-```bash
+
+\`\`\`bash
 cargo check --locked
-```
+\`\`\`
 
 # Also good — explicit sequence with context
-```bash
+
+\`\`\`bash
 # Install dependencies then verify
 npm install
 npm run build
 cargo check --locked
-```
+\`\`\`
 
 # Bad — dump of unrelated commands
-```bash
+
+\`\`\`bash
 cargo check --locked
 pip install -r requirements.txt
 ollama list
 dotnet build
-```
+\`\`\`
 ```
 
 ---
@@ -395,7 +398,7 @@ blocks — let them run long.
 ## Failure modes — what bad Markdown looks like
 
 | Symptom | Likely cause | Fix |
-|---|---|---|
+| --- | --- | --- |
 | Wall of text with no headings | Author wrote prose, not a document | Add `##` headings every 3–5 paragraphs |
 | Every other word is bold | Bold used for decoration | Remove bold except for MUST/NEVER keywords and critical terms |
 | Nested bullets 4 levels deep | List structure replacing document structure | Flatten with subheadings |
