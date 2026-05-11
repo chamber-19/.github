@@ -1,0 +1,55 @@
+name: Lint YAML
+
+on:
+  push:
+    paths:
+      - '**/*.yml'
+      - '**/*.yaml'
+  pull_request:
+    paths:
+      - '**/*.yml'
+      - '**/*.yaml'
+  workflow_dispatch:
+
+jobs:
+  yamllint:
+    name: yamllint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install yamllint
+        run: pip install yamllint
+
+      - name: Run yamllint
+        run: |
+          yamllint -d '{
+            extends: default,
+            rules: {
+              line-length: {max: 160, level: warning},
+              truthy: {allowed-values: ["true", "false", "on", "off"], check-keys: false},
+              comments: {min-spaces-from-content: 1},
+              braces: {max-spaces-inside: 1},
+              brackets: {max-spaces-inside: 1}
+            }
+          }' \
+            --no-warnings \
+            $(find . \
+              -name "*.yml" -o -name "*.yaml" \
+              | grep -v node_modules \
+              | grep -v ".git/" \
+              | grep -v "vendor/")
+
+  actionlint:
+    name: actionlint (GitHub Actions syntax)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install actionlint
+        run: |
+          bash <(curl -fsSL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+          sudo mv actionlint /usr/local/bin/
+
+      - name: Run actionlint
+        run: actionlint

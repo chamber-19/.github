@@ -1,44 +1,113 @@
-TAURI 2.0 SKILL
-Mental model
+# Tauri 2.0 Skill
 
-Tauri is a toolkit for building desktop applications using a Rust backend and a WebView frontend. In Tauri 2.0, your app consists of two processes:
+Use this skill when writing Tauri commands, IPC handlers, sidecar integrations, events, or packaging configuration in any Chamber 19 desktop app. Apply it before producing or modifying any Tauri-related Rust or frontend code.
 
-A Rust core that exposes commands (annotated with #[tauri::command]), handles filesystem access and spawns sidecars. It owns the application state and orchestrates background work.
-A web UI that runs inside a native WebView (Chromium on Windows/Linux, WebKit on macOS). It uses JavaScript/TypeScript to render the interface and talk to the Rust core over an IPC bridge.
+---
 
-Communication between the frontend and backend is asynchronous. The frontend calls Rust commands via the @tauri-apps/api package, and the backend emits events to the frontend using emit_all or emit. Tauri does not allow blocking the event loop—long‑running work must stream progress via events or run in a sidecar.
+## Mental model
 
-Non‑negotiable patterns
-Define a single isTauri constant: const isTauri = typeof window !== "undefined" && "TAURI_INTERNALS" in window;. Use this guard before calling any Tauri APIs to avoid errors in browser contexts.
-Annotate each command with #[tauri::command] and return Result<T, String>. Do not unwrap results in command handlers; propagate errors to the frontend so it can display them.
-Stream progress using emit_all (for global events) or emit (for a specific window). For example:
-#[tauri::command]
-async fn download(app: tauri::AppHandle) -> Result<(), String> {
-    app.emit_all("download-started", ());
-    // ... perform work and periodically emit progress
-    for pct in 0..=100 {
-        app.emit_all("download-progress", pct)?;
-    }
-    app.emit_all("download-finished", ());
-    Ok(())
-}
-Handle sidecar communication via newline‑delimited JSON. Spawn Python sidecars using Tauri’s Command API and read/write JSON objects line by line.
-Commit Cargo.lock and keep your Rust, Node and Python dependency versions pinned. Use desktop‑toolkit as the root of the dependency tree; bump versions in a dedicated PR.
-Common libraries and APIs
-Use case	Library/Crate	Notes
-IPC from frontend	@tauri-apps/api/tauri	invoke("command", { args }), listen("event", callback)
-JSON serialization	serde / serde_json	derive Serialize/Deserialize on structs sent over IPC
-Async tasks	tokio	Spawn tasks with tokio::spawn for long‑running work
-Sidecar processes	tauri::api::process::Command	Spawn Python scripts and pipe stdio
-UI notifications	@tauri-apps/api/notification	Show system notifications or dialogues
-Failure modes
-Symptom	Likely cause	Fix
-Frontend never receives progress updates	Using a synchronous loop in a command without emitting events	Break the work into chunks and call emit_all() between iterations
-App hangs during sidecar execution	Missing flush=True in Python print statements	Ensure all sidecar print calls include flush=True
-Error “unknown IPC channel”	Calling invoke() without defining isTauri guard	Define and use the isTauri constant before invoking commands
-Deadlock when reading a file from the plugin	Opening the same file twice in different modes	Use Rust’s ownership correctly and avoid holding multiple locks on the same file
-Quick reference
-Development: npm install followed by npm run tauri dev runs the frontend in hot‑reload mode and compiles the Rust backend.
-Build: npm run tauri build produces platform installers (e.g. MSI, DMG). Use the --target flag to cross‑compile.
-Rust tools: cargo fmt formats the code; cargo clippy -- -D warnings lints it; cargo tauri dev is an alternative to the npm script if you prefer a pure Rust workflow.
-Updating dependencies: Bump versions in Cargo.toml, package.json and python/requirements.txt together in a single pin bump PR.
+Tauri is a toolkit for building desktop applications with a Rust backend and a WebView frontend. A Tauri 2.0 app has two processes:
+
+- **Rust core** — exposes commands (annotated `#[tauri::command]`), handles filesystem access, and spawns sidecars. It owns application state and orchestrates background work.
+- **WebView frontend** — React/TypeScript running inside a native WebView (WebKit on macOS, WebView2 on Windows). It communicates with the Rust core over an IPC bridge.
+
+Communication is always asynchronous. The frontend calls Rust commands via `invoke()` from `@tauri-apps/api`. The Rust core pushes updates to the frontend via `emit_all()` or `emit()`. Blocking the event loop is not allowed — long-running work must stream progress via events or run in a sidecar.
+
+---
+
+## Non-negotiable patterns
+
+- **Define `isTauri` at module load** and use it before every IPC call:
+  
+  ```ts
+  const isTauri = typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
+  ```
+
+  Never use inline checks or repeated string literals. This guard prevents errors when the frontend runs in a browser context (dev, test, Storybook).
+
+- **Return `Result<T, String>`** from every `#[tauri::command]`. Never `.unwrap()` inside a command handler — propagate errors to the frontend so it can display them.
+
+- **Stream long-running work via events**. Never make the frontend poll:
+  
+  ```rust
+  #[tauri::command]
+  async fn process(app: tauri::AppHandle) -> Result<(), String> {
+      app.emit_all("process-started", ()).map_err(|e| e.to_string())?;
+      for step in 0..=100 {
+          // do work
+          app.emit_all("process-progress", step).map_err(|e| e.to_string())?;
+      }
+      app.emit_all("process-finished", ()).map_err(|e| e.to_string())?;
+      Ok(())
+  }
+  ```
+
+- **Communicate with sidecars via newline-delimited JSON**. Spawn Python sidecars using Tauri's `Command` API and read/write one JSON object per line.
+
+- **Commit `Cargo.lock`** and run `cargo check --locked` before every PR. Dependency drift is a build failure.
+
+- **Bump desktop-toolkit pins together**. When updating `desktop-toolkit`, update `Cargo.toml`, `package.json`, and `requirements.txt` in a single dedicated PR. Never mix pin bumps with feature work.
+
+---
+
+## Common libraries and APIs
+
+| Use case | Library / Crate | Notes |
+| --- | --- | --- |
+| IPC from frontend | `@tauri-apps/api` | `invoke("command_name", { args })`, `listen("event", callback)` |
+| JSON serialization | `serde`, `serde_json` | Derive `Serialize`/`Deserialize` on all structs sent over IPC |
+| Async tasks | `tokio` | `tokio::spawn` for concurrent work; `spawn_blocking` for CPU tasks |
+| Sidecar processes | `tauri::api::process::Command` | Spawn Python scripts and pipe stdio |
+| Managed state | `tauri::State<T>` | Share state between commands without global mutables |
+| System notifications | `@tauri-apps/api/notification` | Show OS-level notifications or dialogs |
+
+---
+
+## Failure modes
+
+| Symptom | Likely cause | Fix |
+| --- | --- | --- |
+| Frontend never receives progress updates | Synchronous loop in command without emitting events | Break work into chunks and call `emit_all()` between iterations |
+| App hangs during sidecar execution | Python sidecar missing `flush=True` on `print()` | Add `flush=True` to all sidecar print calls |
+| `unknown IPC channel` error | Calling `invoke()` without the `isTauri` guard or before the WebView is ready | Define and use the `isTauri` constant; wait for `onMounted` or document ready |
+| Deadlock reading a file | Same file opened twice in different modes | Use Rust ownership correctly; never hold multiple locks on the same path |
+| Stale UI after backend state change | Frontend polled and missed an update | Convert to event-based updates using `emit_all()` and `listen()` |
+
+---
+
+## Chamber 19 specifics
+
+- All Chamber 19 Tauri apps share a common architecture: React frontend, Rust Tauri shell, Python FastAPI sidecar. See `CLAUDE.md` at the repo root for the full layout.
+- `desktop-toolkit` provides shared Tauri primitives, the activation service, and sidecar boilerplate. Do not duplicate these in consumer repos.
+- Activation logic (`toolkit_check_activation`, `toolkit_activate_with_pin`, `toolkit_deactivate`) lives in `desktop-toolkit`. Never re-implement it in a consumer app.
+- The `launcher` is the single desktop shell for all Chamber 19 tools. Consumer apps do not ship their own installers.
+
+---
+
+## Reference documentation
+
+- [Tauri v2 documentation](https://v2.tauri.app/start/) — official guide covering commands, events, plugins, permissions, and packaging for Tauri 2.0
+
+---
+
+## Quick reference
+
+```bash
+# Install frontend dependencies
+npm ci
+
+# Start frontend + Rust in dev mode (hot reload)
+npm run desktop
+
+# Build production desktop app
+npm run desktop:build
+
+# Type-check Rust (from frontend/src-tauri/)
+cargo check --locked
+
+# Format Rust
+cargo fmt
+
+# Lint Rust
+cargo clippy -- -D warnings
+```

@@ -1,12 +1,11 @@
 name: General issue or task
-description: Use this for normal work that does not fit a Copilot task category
+description: Use this for normal work requests and internal tasks
 title: "[Issue]: "
 body:
   - type: markdown
     attributes:
       value: |
-        Use this template for regular issues or tasks
-        when Copilot task templates do not fit.
+        Use this template for regular issues or tasks.
   - type: textarea
     attributes:
       label: Summary

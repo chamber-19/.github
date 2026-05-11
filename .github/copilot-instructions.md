@@ -34,31 +34,28 @@ into the workflow.
 
 ---
 
+## Working on this repo (`chamber-19/.github`)
+
+When the change is **inside this repo** (not a consumer repo), additional rules apply. See [`AGENTS.md`](../AGENTS.md) for the full set; the load-bearing ones:
+
+- **MUST** add an entry to [`CHANGELOG.md`](../CHANGELOG.md) under `## [Unreleased]` for every PR. Use Keep a Changelog categories: `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`.
+- **MUST** keep the family table inside `<!-- family-table:start ... end -->` markers as a single table. The `scripts/reconcile-family-table.ps1` script regenerates this block; never hand-edit if you can run the script instead.
+- **MUST** keep instruction wrappers in `.github/instructions/` thin (under 3 KB) — they load via `applyTo:` and reference the deep skill in `docs/skills/`.
+- **NEVER** add a skill in `docs/skills/` without also adding the matching wrapper in `.github/instructions/` and the row in the skills registry table below.
+- **NEVER** edit submodule content (`docs/skills/tauri2-skills/`, `docs/skills/threejs-skills/`) — update the submodule pointer instead.
+
+These rules apply only when working *on* this repo. Consumer repos load this file as family-wide guidance — they do not need to maintain a CHANGELOG here.
+
+---
+
 ## Family table
 
 <!-- family-table:start -->
 | Repo | Role | Stack |
-|---|---|---|
-| `.github` | Org-wide config, shared instructions, skill files, memory, evals | Markdown, YAML |
-| `desktop-toolkit` | Shared framework: Tauri primitives, sidecar boilerplate, NSIS installer, CI templates, **activation service** | Rust, Tauri 2.0, React, Python, FastAPI |
-| `launcher` | Universal Tauri shell: desktop integration, app routing, activation gate, updates for all tools | Tauri 2.0, React, Rust |
-| `transmittal-builder` | Backend service: generates transmittal packages (scans folders, renders Word, merges PDFs) | Python FastAPI |
-| `Drawing-List-Manager` | Backend service: manages drawing registers (editing, revisions, validation) | Python FastAPI |
-| `batch-fnr` | Backend service: batch find and replace text across multiple AutoCAD DWG files | Python FastAPI, .NET 10 sidecar |
-| `Foundry` | Local agent broker: enqueues GitHub/Discord jobs, dispatches to Ollama, posts results | C# (.NET), Python, Ollama |
-| `autocad-knowledge` | Reference patterns and knowledge base for AutoCAD .NET plugins | C#, Markdown |
-| `IFA-IFC-Checklist` | Macro-enabled Excel workbook for IFA/IFC pre-submittal checklists with ribbon buttons and PDF export | VBA, Excel |
-| `block-library` | **UI-first:** Tauri 2 desktop DXF viewer with Google Drive catalog sync and SQLite local cache | Tauri 2.0, React, Three.js, Rust |
-
-**Architecture notes:**
-
-- **Backend-first apps** (`transmittal-builder`, `Drawing-List-Manager`, `batch-fnr`): Stateless REST services on localhost, routed through launcher
-- **UI-first apps** (`block-library`): Desktop-native Tauri apps with rich UI (3D rendering, interactive state). Kept in production deployment due to GPU/rendering requirements
-- **Shared framework** (`desktop-toolkit`): Powers both backend routing (activation service) and desktop shells
-- **Launcher** (`launcher`): Universal Tauri shell that routes to all backend services and coordinates updates
+| --- | --- | --- |
 | `desktop-toolkit` | Shared framework for Tauri desktop apps | Tauri 2.0, React, Rust, Python |
 | `launcher` | Desktop launcher and updater — activation, app routing, updater | Tauri 2.0, React, Rust |
-| `transmittal-builder` | Tauri app with Python sidecar — engineering transmittal package generator | Tauri 2.0, Rust, Python |
+| `transmittal-builder` | Python FastAPI backend service — engineering transmittal package generator | Python, FastAPI |
 | `Drawing-List-Manager` | Tauri app with Python sidecar — project drawing register | Tauri 2.0, Rust |
 | `batch-fnr` | Batch DXF Find-and-Replace with headless .NET AutoCAD sidecar | Tauri 2.0, Rust, React, .NET |
 | `block-library` | Tauri 2 desktop DXF viewer with Google Drive catalog sync and SQLite local cache | Tauri 2.0, React, Three.js, Rust |
@@ -66,6 +63,7 @@ into the workflow.
 | `autocad-knowledge` | AutoCAD .NET pattern reference — source of truth for AUTOCAD_DOTNET.md skill | Markdown, C# samples |
 | `chamber-19-autocad-mcp` | MCP server inside AutoCAD — read-only inspection surface for LLM agents | .NET, PowerShell |
 | `IFA-IFC-Checklist` | Macro-enabled Excel workbook for IFA/IFC pre-submittal checklists | Excel VBA |
+| `Glyphic` | TODO: curate role for Glyphic | TODO |
 | `.github` | TODO: curate role copy for this repo in family-table generation | Markdown, YAML |
 <!-- family-table:end -->
 
@@ -190,12 +188,17 @@ relevant skill file before making changes in a given language or domain.
 | `RUST.md` | Writing any Rust — commands, structs, async, error handling |
 | `PYTHON.md` | Writing Python sidecars, automation, ML pipelines, COM |
 | `AUTOCAD_DOTNET.md` | Writing AutoCAD .NET plugins, transactions, attribute access |
-| `VBA_EXCEL.md` | Writing VBA macros for the IFA-IFC-Checklist workbook |
+| `VBA_EXCEL.md` | Building or formatting Excel workbooks — form controls, VBA macros, charts, conditional formatting, sheet protection |
 | `MARKDOWN.md` | Writing or editing any `.md` file in the org |
-| `DOCX.md` | Working with Word document generation in transmittal-builder |
+| `CHANGELOG.md` | Writing or updating any `CHANGELOG.md` file — format, date convention, categories, release procedure |
+| `BIOME.md` | Writing or linting TypeScript/JavaScript in `launcher`, `block-library`, or `desktop-toolkit` frontends |
+| `DOCX.md` | Creating `.docx` files — `python-docx` (Python) or `docx` npm (JavaScript) |
 | `tauri2-skills/skills/source/` | Read before any Tauri 2 command, event, permission, or build change |
 | `threejs-skills/skills/source/` | Read before any Three.js/R3F work in block-library |
 | `AUTOCAD_ASSISTANT.md` | Writing Autodesk Assistant queries, session priming, or any programmatic MCP client code |
+| `acquire-codebase-knowledge/SKILL.md` | Mapping or documenting an existing codebase — outputs seven `docs/codebase/` documents |
+| `AI_READY.md` | Making a repo AI-ready — verifying or creating `AGENTS.md`, `copilot-instructions.md`, CI workflows, issue templates |
+| `POWERSHELL.md` | Writing or reviewing PowerShell scripts — approved verbs, parameter design, error handling, GitHub API patterns, `PowerShellForGitHub` |
 
 ---
 
@@ -239,10 +242,13 @@ Do not rely on training data for version-specific details.
 
 ## Institutional memory
 
-Organisational memory lives in `docs/memory.md` in this repo. It records
-incidents, compatibility traps, and closed decisions with evidence. Read
-it before making architectural decisions. When you find a trap or
-incident in any repo, add an entry with evidence.
+Organisational memory lives in `docs/memory.md` in this repo. It records incidents, compatibility traps, and closed decisions with evidence. Read it before making architectural decisions. When you find a trap or incident in any repo, add an entry with evidence.
+
+**Memory lifecycle:**
+
+- Entries carry one of three statuses: `[Active]` (still load-bearing), `[Promoted]` (distilled into a MUST/NEVER rule in this file), or `[Deprecated]` (no longer applies).
+- **Consolidation trigger:** when 3+ incidents share a pattern, distill them into a MUST/NEVER rule in this file and mark the source incidents `[Promoted]` in `docs/memory.md`.
+- **Handoff boundary:** session-specific discoveries stay in Claude Code Auto Memory (`~/.claude/projects/.../memory/`). Org-wide traps that affect any contributor (human or AI) get promoted to `docs/memory.md`. Hardened rules land here and are marked `[Promoted]` in `docs/memory.md`.
 
 ---
 

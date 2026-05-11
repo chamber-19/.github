@@ -1,5 +1,4 @@
 ---
-mode: agent
 description: Bump the version of this app/package across all manifest files, regenerate lockfiles, and update CHANGELOG.
 ---
 

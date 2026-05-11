@@ -1,5 +1,4 @@
 ---
-mode: agent
 description: Bump the pinned desktop-toolkit version in this consumer repo across JS and Rust manifests in lockstep.
 ---
 
@@ -36,9 +35,9 @@ dependency to the matching version.
 ### Step 3 — Verify both pins agree
 
 Both pins must reference the same `desktop-toolkit` version. This is the
+report the discrepancy.
 most common source of breakage. Read both files after editing and confirm
 the versions match before continuing. If they do not match, stop and
-report the discrepancy.
 
 ### Step 4 — Regenerate lockfiles
 

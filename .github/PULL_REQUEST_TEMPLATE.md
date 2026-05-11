@@ -1,16 +1,15 @@
-# Summary
+# Pull Request
 
-<!-- One sentence: what changed and why -->
+<!-- auto-pr:managed -->
 
-## Acceptance criteria addressed
-<!-- Tick the criteria from the issue this PR closes -->
-- [ ]
+## What changed
+<!-- Auto-generated from changed files when the PR is opened or updated. -->
 
-## Out of scope
-<!-- Things explicitly not in this PR -->
+## Why
+<!-- Optional: add one short line if context is not obvious. -->
 
 ## Verification
-<!-- How you (or CI) confirmed this works. Include the build/test command run. -->
+<!-- Optional: add command(s) you ran, or write Not run. -->
 
 ## Linked issue
 

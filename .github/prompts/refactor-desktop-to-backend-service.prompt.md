@@ -1,6 +1,6 @@
 # Prompt: Refactor Tauri Desktop App to Backend-Only HTTP Service
 
-**Purpose:** Template for refactoring a Chamber 19 Tauri desktop application into a stateless backend-only HTTP service aligned with the May 2026 architecture.
+**Purpose:** Template for refactoring a Chamber 19 Tauri desktop application into a stateless backend-only HTTP service aligned with the current Chamber 19 backend-only architecture.
 
 **Example Predecessor:** See `transmittal-builder` Phase 1 execution for the complete reference implementation.
 
@@ -51,8 +51,7 @@ backend/
 │   ├── __init__.py
 │   ├── test_endpoints.py          # Pytest unit tests for each endpoint
 │   └── conftest.py                # Pytest fixtures
-├── README_SIDECAR.md              # Local testing instructions
-└── Dockerfile                     # Optional: containerization
+└── README_SIDECAR.md              # Local testing instructions
 ```
 
 ### 1.2 Extract business logic from Tauri commands
@@ -198,7 +197,7 @@ rm -rf frontend/src-tauri/.cargo/
 This directory contains the legacy Tauri + React desktop shell code.
 **This code is not built or deployed.**
 
-As of v1.0.0 (May 2026), this tool is now a stateless backend service.
+As of v1.0.0, this tool is now a stateless backend service.
 The desktop shell was consolidated into chamber-19/launcher.
 
 See ../backend/ for the active service code.
@@ -395,32 +394,32 @@ Always returns 200:
 
 ### 4.3 Create `docs/DEPLOYMENT.md`
 
-```markdown
-# Deployment Options
+Chamber 19 backends are not containerised or cloud-deployed. Launcher manages service lifecycle on the engineer's local machine. The deployment doc should reflect that.
 
-## Local (Development)
+```markdown
+# Deployment
+
+## Normal use (launcher-managed)
+
+Launcher discovers and spawns this service automatically.
+No manual steps are required during normal use.
+
+## Local development
 
 ```bash
 cd backend && python -m uvicorn app:app --port 8000
 ```
 
-## Docker
+Visit `http://localhost:8000/api/docs` for interactive API documentation.
 
-```bash
-docker build -t my-service:1.0.0 -f backend/Dockerfile .
-docker run -p 8000:8000 my-service:1.0.0
-```
-
-## Kubernetes
-
-See chamber-19/desktop-toolkit for shared Helm templates.
-
-## Environment Variables
+## Environment variables
 
 - `SERVICE_PORT` (default: 8000)
-- `LOG_LEVEL` (default: info)
-- `TEMP_DIR` (default: /tmp)
+- `LOG_LEVEL` (default: `info`)
+- `TEMP_DIR` (default: system temp directory)
 ```
+
+Docker and Kubernetes are not part of the chamber-19 deployment model. If a future service genuinely requires containerisation, that decision belongs in the relevant repo's `copilot-instructions.md` — do not add it here speculatively.
 
 ### 4.4 Update `.github/copilot-instructions.md`
 
@@ -462,7 +461,7 @@ Add release notes under `[Unreleased]` (will move to version section during rele
 
 ### Changed
 
-- **BREAKING: Architecture refactor (May 2026)**
+- **BREAKING: Architecture refactor**
   - Desktop shell moved to chamber-19/launcher
   - Application is now a stateless HTTP service (Python + FastAPI)
   - No NSIS installer or Tauri build in this repo
@@ -519,7 +518,7 @@ git commit -m "chore: Bump version to 1.0.0"
 ```bash
 git tag -a v1.0.0 -m "Release v1.0.0 — Backend-only service with architecture refactor
 
-This is the first release following the May 2026 architecture refactor.
+This is the first release following the Chamber 19 backend-only service architecture.
 
 Key changes:
 - Desktop shell moved to chamber-19/launcher
@@ -560,9 +559,10 @@ After backend is released and tested:
 - [ ] Verify hard decisions still apply
 - [ ] Add any new architectural patterns
 
-**Update `.github/docs/skills/MARKDOWN.md`:**
-- [ ] Ensure markdown standards are current
-- [ ] Fix any linting violations in org-wide docs
+**Apply the MARKDOWN skill when writing documentation:**
+- [ ] Read `docs/skills/MARKDOWN.md` before writing any `.md` file in this repo
+- [ ] Fix any linting violations in the docs you produce
+- [ ] Do NOT edit `docs/skills/MARKDOWN.md` itself — that is org-wide shared state
 
 ### 7.2 `launcher` repo (if new backend)
 
@@ -621,15 +621,14 @@ See **`chamber-19/transmittal-builder`** Phase 1 for the complete executed patte
 
 - `backend/app.py` — FastAPI service with all endpoints
 - `.github/workflows/release.yml` — Backend-only CI
-- `CHANGELOG.md` — v1.0.0 release notes with breaking changes
+- `CHANGELOG.md` — v1.0.0 release notes with breaking changes (this is the canonical record of what changed; do not create a separate `E2E_CLEANUP_SUMMARY.md` or equivalent)
 - `.github/copilot-instructions.md` — Repo-specific guidance
-- `E2E_CLEANUP_SUMMARY.md` — Documentation of all changes
 
 ---
 
 ## Summary
 
-This refactor converts a Tauri desktop app into a stateless HTTP backend service aligned with the May 2026 Chamber 19 architecture:
+This refactor converts a Tauri desktop app into a stateless HTTP backend service aligned with the Chamber 19 backend-only architecture:
 
 1. **Extract business logic** → Python FastAPI service
 2. **Remove desktop code** → Leave deprecation notices

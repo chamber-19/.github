@@ -26,7 +26,31 @@ function Get-PythonCommand {
         return "python"
     }
 
-    throw "YAML parser fallback requires Python 3 with PyYAML, but no python executable was found."
+    # Conda/Miniconda — $env:CONDA_PREFIX is set when a conda env is active
+    if ($env:CONDA_PREFIX) {
+        $condaPython = Join-Path $env:CONDA_PREFIX "python.exe"
+        if (Test-Path $condaPython) {
+            return $condaPython
+        }
+    }
+
+    # Common Miniconda3/Anaconda3 install locations on Windows
+    $candidatePaths = @(
+        "$env:USERPROFILE\miniconda3\python.exe",
+        "$env:USERPROFILE\Miniconda3\python.exe",
+        "$env:USERPROFILE\anaconda3\python.exe",
+        "$env:USERPROFILE\Anaconda3\python.exe",
+        "C:\ProgramData\miniconda3\python.exe",
+        "C:\ProgramData\Miniconda3\python.exe"
+    )
+
+    foreach ($candidate in $candidatePaths) {
+        if (Test-Path $candidate) {
+            return $candidate
+        }
+    }
+
+    throw "YAML parser fallback requires Python 3 with PyYAML. Preferred fix: Install-Module -Name powershell-yaml -Scope CurrentUser"
 }
 
 function Get-GitHubHeaders {
@@ -132,7 +156,7 @@ function Get-OrgRepoNames {
     return $all
 }
 
-function Escape-Cell {
+function ConvertTo-EscapedCell {
     param([AllowNull()][string]$Value)
 
     if ($null -eq $Value) {
@@ -160,7 +184,7 @@ function Build-TableText {
 
     $lines = New-Object System.Collections.Generic.List[string]
     $lines.Add("| $($columns -join ' | ') |") | Out-Null
-    $lines.Add("|$((@('---') * $columns.Count) -join '|')|") | Out-Null
+    $lines.Add("| $(@('---') * $columns.Count -join ' | ') |") | Out-Null
 
     foreach ($repo in $Repos) {
         $cells = New-Object System.Collections.Generic.List[string]
@@ -173,10 +197,10 @@ function Build-TableText {
                 }
                 "Role" {
                     $role = if ($TargetName -eq "profile") { $repo.profile_role } else { $repo.copilot_role }
-                    $cells.Add((Escape-Cell -Value $role)) | Out-Null
+                    $cells.Add((ConvertTo-EscapedCell -Value $role)) | Out-Null
                 }
                 "Stack" {
-                    $cells.Add((Escape-Cell -Value $repo.stack)) | Out-Null
+                    $cells.Add((ConvertTo-EscapedCell -Value $repo.stack)) | Out-Null
                 }
                 default {
                     throw "Unsupported column '$column' in target '$TargetName'."
@@ -190,7 +214,7 @@ function Build-TableText {
     return ($lines -join "`n")
 }
 
-function Replace-TableSection {
+function Update-TableSection {
     param(
         [Parameter(Mandatory = $true)]
         [string]$FilePath,
@@ -354,7 +378,7 @@ try {
         $targetFile = Join-Path $repoRoot ([string]$target.file)
         $tableText = Build-TableText -TargetName $targetName -TargetConfig $target -Repos $manifest.repos
         $originalContent = Get-Content -LiteralPath $targetFile -Raw
-        $updatedContent = Replace-TableSection -FilePath $targetFile -TableText $tableText
+        $updatedContent = Update-TableSection -FilePath $targetFile -TableText $tableText
 
         if ($originalContent -ne $updatedContent) {
             if ($DryRun) {

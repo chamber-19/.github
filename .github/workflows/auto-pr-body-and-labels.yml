@@ -1,0 +1,198 @@
+name: Auto PR Body and Labels
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - edited
+      - ready_for_review
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  autofill-and-label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build PR summary and apply labels
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const pull_number = context.payload.pull_request.number;
+            const existingBody = context.payload.pull_request.body || "";
+
+            if (existingBody.includes("<!-- auto-pr:off -->")) {
+              core.info("Auto-PR management disabled by marker.");
+              return;
+            }
+
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner,
+              repo,
+              pull_number,
+              per_page: 100,
+            });
+
+            const totalAdditions = files.reduce((sum, file) => sum + (file.additions || 0), 0);
+            const totalDeletions = files.reduce((sum, file) => sum + (file.deletions || 0), 0);
+            const totalChanges = totalAdditions + totalDeletions;
+
+            const buckets = {
+              workflows: [],
+              templates: [],
+              docs: [],
+              prompts: [],
+              instructions: [],
+              scripts: [],
+              profile: [],
+              other: [],
+            };
+
+            for (const file of files) {
+              const p = file.filename;
+              if (p.startsWith(".github/workflows/")) {
+                buckets.workflows.push(p);
+              } else if (
+                p.startsWith(".github/ISSUE_TEMPLATE/") ||
+                p === ".github/PULL_REQUEST_TEMPLATE.md" ||
+                p.startsWith("workflow-templates/")
+              ) {
+                buckets.templates.push(p);
+              } else if (p.startsWith("docs/")) {
+                buckets.docs.push(p);
+              } else if (p.startsWith(".github/prompts/")) {
+                buckets.prompts.push(p);
+              } else if (p.startsWith(".github/instructions/")) {
+                buckets.instructions.push(p);
+              } else if (p.startsWith("scripts/") || p.startsWith(".github/scripts/")) {
+                buckets.scripts.push(p);
+              } else if (p.startsWith("profile/")) {
+                buckets.profile.push(p);
+              } else {
+                buckets.other.push(p);
+              }
+            }
+
+            const scope =
+              Object.entries(buckets)
+                .filter(([, list]) => list.length > 0)
+                .map(([name]) => name)
+                .join(", ") || "none";
+
+            const sample = files.slice(0, 12).map((file) => {
+              const status =
+                file.status === "renamed"
+                  ? `renamed from ${file.previous_filename}`
+                  : file.status;
+              return `- ${file.filename} (${status}, +${file.additions || 0} / -${file.deletions || 0})`;
+            });
+
+            const truncated = files.length > 12 ? `\n- ...and ${files.length - 12} more file(s)` : "";
+
+            const generatedBody = [
+              "# Pull Request",
+              "",
+              "<!-- auto-pr:managed -->",
+              "",
+              "## What changed",
+              `Scope: ${scope}`,
+              `Files changed: ${files.length}`,
+              `Diff size: +${totalAdditions} / -${totalDeletions} (total ${totalChanges})`,
+              "",
+              ...sample,
+              truncated,
+              "",
+              "## Why",
+              "Optional: add one short line if context is not obvious.",
+              "",
+              "## Verification",
+              "Optional: add command(s) you ran, or write Not run.",
+              "",
+              "## Linked issue",
+              "Closes #",
+              "",
+              "Tip: add <!-- auto-pr:off --> to stop future auto-updates to this PR body.",
+            ].join("\n");
+
+            const hasManagedMarker = existingBody.includes("<!-- auto-pr:managed -->");
+            const looksLikeLegacyTemplate =
+              existingBody.includes("## Acceptance criteria addressed") ||
+              existingBody.includes("# Summary");
+            const shouldReplaceBody =
+              existingBody.trim() === "" || hasManagedMarker || looksLikeLegacyTemplate;
+
+            if (shouldReplaceBody) {
+              await github.rest.pulls.update({
+                owner,
+                repo,
+                pull_number,
+                body: generatedBody,
+              });
+              core.info("PR body updated.");
+            } else {
+              core.info("Skipped PR body update because no managed marker was found.");
+            }
+
+            const candidateLabels = new Set();
+            if (buckets.docs.length) candidateLabels.add("documentation");
+            if (buckets.workflows.length) candidateLabels.add("ci");
+            if (buckets.templates.length) candidateLabels.add("templates");
+            if (buckets.prompts.length || buckets.instructions.length) candidateLabels.add("copilot");
+            if (buckets.scripts.length) candidateLabels.add("automation");
+            if (buckets.profile.length) candidateLabels.add("profile");
+            if (buckets.other.length && candidateLabels.size === 0) candidateLabels.add("needs-triage");
+
+            let sizeLabel = "size: M";
+            if (totalChanges <= 50) sizeLabel = "size: XS";
+            else if (totalChanges <= 200) sizeLabel = "size: S";
+            else if (totalChanges <= 600) sizeLabel = "size: M";
+            else if (totalChanges <= 1200) sizeLabel = "size: L";
+            else sizeLabel = "size: XL";
+            candidateLabels.add(sizeLabel);
+
+            const existingRepoLabels = await github.paginate(github.rest.issues.listLabelsForRepo, {
+              owner,
+              repo,
+              per_page: 100,
+            });
+            const repoLabelSet = new Set(existingRepoLabels.map((label) => label.name));
+
+            const labelsToApply = Array.from(candidateLabels).filter((name) => repoLabelSet.has(name));
+
+            const currentIssueLabels = await github.rest.issues.listLabelsOnIssue({
+              owner,
+              repo,
+              issue_number: pull_number,
+              per_page: 100,
+            });
+
+            for (const label of currentIssueLabels.data) {
+              const labelName = label.name;
+              if (labelName.startsWith("size:") && labelName !== sizeLabel) {
+                await github.rest.issues
+                  .removeLabel({
+                    owner,
+                    repo,
+                    issue_number: pull_number,
+                    name: labelName,
+                  })
+                  .catch(() => {});
+              }
+            }
+
+            if (labelsToApply.length > 0) {
+              await github.rest.issues.addLabels({
+                owner,
+                repo,
+                issue_number: pull_number,
+                labels: labelsToApply,
+              });
+              core.info(`Applied labels: ${labelsToApply.join(", ")}`);
+            } else {
+              core.info("No matching labels found in repo; skipped labeling.");
+            }

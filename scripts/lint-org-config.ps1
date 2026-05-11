@@ -11,7 +11,7 @@ function Get-RepoRelativePath {
     return [System.IO.Path]::GetRelativePath($RepoRoot, $Path).Replace("\", "/")
 }
 
-function Escape-AnnotationValue {
+function ConvertTo-EscapedAnnotation {
     param([Parameter(Mandatory = $true)][string]$Value)
     return $Value.Replace("%", "%25").Replace("`r", "%0D").Replace("`n", "%0A")
 }
@@ -24,8 +24,8 @@ function Add-ErrorAnnotation {
     )
 
     $script:hasErrors = $true
-    $relativePath = Escape-AnnotationValue (Get-RepoRelativePath -Path $FilePath)
-    $escapedMessage = Escape-AnnotationValue $Message
+    $relativePath = ConvertTo-EscapedAnnotation (Get-RepoRelativePath -Path $FilePath)
+    $escapedMessage = ConvertTo-EscapedAnnotation $Message
     Write-Host "::error file=$relativePath,line=$Line::$escapedMessage"
 }
 
@@ -126,8 +126,8 @@ foreach ($markdownFile in $markdownFiles) {
     $lines = Get-FileLines -FilePath $markdownFile.FullName
     for ($lineIndex = 0; $lineIndex -lt $lines.Count; $lineIndex++) {
         $line = $lines[$lineIndex]
-        $matches = $skillReferenceRegex.Matches($line)
-        foreach ($match in $matches) {
+        $skillMatches = $skillReferenceRegex.Matches($line)
+        foreach ($match in $skillMatches) {
             $refPath = "docs/skills/$($match.Groups["name"].Value).md"
             if (-not $resolvedSkills.ContainsKey($refPath.ToLowerInvariant())) {
                 Add-ErrorAnnotation -FilePath $markdownFile.FullName -Line ($lineIndex + 1) -Message "Skill reference '$refPath' does not resolve to a file in docs/skills/."
