@@ -23,6 +23,18 @@ jobs:
 
       - name: Run yamllint
         run: |
+          set -euo pipefail
+          mapfile -d '' yaml_files < <(find . -type f \( -name "*.yml" -o -name "*.yaml" \) \
+            ! -path "*/node_modules/*" \
+            ! -path "*/.git/*" \
+            ! -path "*/vendor/*" \
+            -print0)
+
+          if [ "${#yaml_files[@]}" -eq 0 ]; then
+            echo "No YAML files found."
+            exit 0
+          fi
+
           yamllint -d '{
             extends: default,
             rules: {
@@ -32,13 +44,7 @@ jobs:
               braces: {max-spaces-inside: 1},
               brackets: {max-spaces-inside: 1}
             }
-          }' \
-            --no-warnings \
-            $(find . \
-              -name "*.yml" -o -name "*.yaml" \
-              | grep -v node_modules \
-              | grep -v ".git/" \
-              | grep -v "vendor/")
+          }' --no-warnings "${yaml_files[@]}"
 
   actionlint:
     name: actionlint (GitHub Actions syntax)

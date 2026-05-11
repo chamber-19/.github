@@ -37,6 +37,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 #### Fixed
 
 - `scripts/lint-org-config.ps1` — renamed `$matches` → `$skillMatches` to avoid assigning to the `$Matches` automatic variable, eliminating a PSScriptAnalyzer warning.
+- `.github/workflows/fix-biome.yml` and `.github/workflows/fix-tailwind-canonical-vars.yml` — replaced single-quoted multiline shell body construction with heredoc literals to satisfy `actionlint`/shellcheck `SC2016`.
+- `.github/workflows/lint-yaml.yml` — replaced unquoted command substitution with a `find -print0` + `mapfile` array pattern, fixing shellcheck `SC2046` and preserving file paths safely.
+- `scripts/reconcile-family-table.ps1` — Python YAML fallback now uses `json.dumps(..., default=str)` so YAML `date` values serialize correctly; added manifest-shape validation to avoid cascading `repos` property errors.
 
 ### Added
 

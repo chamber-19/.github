@@ -286,7 +286,7 @@ import sys
 import yaml
 
 data = yaml.safe_load(sys.stdin.read())
-print(json.dumps(data))
+print(json.dumps(data, default=str))
 "@
 
     $pythonCommand = Get-PythonCommand
@@ -310,6 +310,23 @@ try {
 
     $manifestRaw = Get-Content -LiteralPath $ManifestPath -Raw
     $manifest = ConvertFrom-YamlCompat -Yaml $manifestRaw
+
+    if ($null -eq $manifest) {
+        throw "Manifest '$ManifestPath' did not parse into an object."
+    }
+
+    $hasReposKey = $false
+    if ($manifest -is [System.Collections.IDictionary]) {
+        $hasReposKey = $manifest.Contains("repos")
+    }
+    else {
+        $manifestPropertyNames = @($manifest.PSObject.Properties.Name)
+        $hasReposKey = "repos" -in $manifestPropertyNames
+    }
+
+    if (-not $hasReposKey) {
+        throw "Manifest '$ManifestPath' is missing required top-level key 'repos'."
+    }
 
     if (-not $manifest.repos -or $manifest.repos.Count -eq 0) {
         throw "Manifest '$ManifestPath' has no repos."
