@@ -43,13 +43,39 @@ Remember to be careful.
 
 ### Heading hierarchy must be consistent
 
-- `#` — document title only. One per file.
+- `#` — document title only. One per file. A second `#` heading in the
+  same file is a `single-h1` (MD025) lint failure.
 - `##` — major sections.
 - `###` — subsections within a major section.
 - `####` — use sparingly. If you need four levels, the structure is
   probably wrong.
 
-Never skip levels. Do not go from `##` to `####`.
+Never skip levels. Do not go from `##` to `####`. Jumping from `##` to
+`####` or from no heading to `###` is a `heading-increment` (MD001) lint
+failure.
+
+### No duplicate headings
+
+Every heading in a file must be unique. Duplicate headings break anchor
+navigation in GitHub, confuse assistive technology, and fail markdown
+linters.
+
+If two sections cover different things, differentiate the headings by
+adding context. For long reference documents with repeating structural
+patterns (pattern blocks, gotcha entries), use `###` subsections inside
+distinct `##` parent sections rather than repeating `##` headings with
+the same name.
+
+```markdown
+# Good — context-qualified headings
+## Transaction failure modes
+## Block attributes failure modes
+
+# Bad — same heading used twice
+## Failure modes
+...
+## Failure modes
+```
 
 ### One idea per paragraph
 
@@ -109,6 +135,49 @@ that must happen in order, a ranked priority list. Use unordered lists
 for everything else. Do not use ordered lists just to make a list look
 more formal.
 
+**`ol-prefix` (MD029) — ordered list item prefix must be sequential.**
+Each item must use its actual number (`1.`, `2.`, `3.`), not `1.` repeated.
+
+```markdown
+# Good — sequential (style "ordered")
+1. First step
+2. Second step
+3. Third step
+
+# Bad — all-ones style causes MD029 warning
+1. First step
+1. Second step
+1. Third step
+```
+
+Markdownlint expects `"style": "ordered"` (the default). Never use the
+all-ones shorthand in Chamber 19 files — it fails linting and is harder
+to read in raw text.
+
+### Blank lines around lists
+
+Every list must be surrounded by blank lines — one blank line before the
+first item and one blank line after the last. Without the blank line
+before, many renderers treat the list as a continuation of the preceding
+paragraph rather than a standalone block.
+
+```markdown
+# Good
+Best Practices:
+
+- Use structured references
+- Prefer named ranges
+- Protect by default
+
+More detail follows here.
+
+# Bad — missing blank line before the list
+Best Practices:
+- Use structured references
+- Prefer named ranges
+- Protect by default
+```
+
 ---
 
 ## Emphasis
@@ -138,6 +207,27 @@ introduced, or light stress. Do not use italic for decoration.
 
 `**_this_**` is almost never the right choice. If something needs both,
 the sentence is doing too much work. Rewrite it.
+
+### No spaces inside emphasis markers
+
+A space immediately inside an emphasis marker (`* text *`, `_ text _`)
+is not valid Markdown. Most parsers render the markers as literal
+characters rather than applying emphasis.
+
+The most common source is code identifiers with trailing underscores
+(`VAR_`, `RELAY_`, `PREFIX_`). These are code values — wrap them in
+backticks, not underscores.
+
+```markdown
+# Good
+`RELAY_*` matches relay block names.
+
+# Bad — _ followed by a space is broken emphasis
+RELAY_ you can filter on DxfCode.BlockName
+
+# Fix — code identifiers belong in backticks
+`RELAY_` followed by a wildcard gives `RELAY_*`
+```
 
 ### ALLCAPS for keywords in instruction files only
 
@@ -195,6 +285,57 @@ Always specify the language: `bash`, `python`, `rust`, `csharp`, `yaml`,
 code. Never leave the language identifier blank on a code block that
 contains real code.
 
+### Fenced code blocks must have a language and blank lines around them
+
+Every fenced code block needs two things:
+
+1. **A language identifier** on the opening fence — `bash`, `python`, `rust`,
+   `csharp`, `yaml`, `toml`, `json`, `markdown`, `text`. Use `text` for
+   terminal output. Never leave it blank.
+
+2. **A blank line before and after** the block. A fence that runs directly
+   into a paragraph above or below it renders incorrectly in some tools and
+   breaks linters.
+
+````markdown
+# Good
+Run the command:
+
+```bash
+cargo check --locked
+```
+
+The output should show no errors.
+
+# Bad — no blank lines, no language
+
+Run the command:
+
+```
+cargo check --locked
+```
+
+The output should show no errors.
+````
+
+### No inline HTML
+
+Raw HTML tags (`<Private>`, `<br>`, `<span>`, etc.) are not valid
+Markdown and will not render correctly in all tools. Linters flag them
+as `no-inline-html` violations.
+
+Wrap XML or HTML tag literals in backticks so they render as code, not
+as markup. If you genuinely need rendered HTML in a web view, reconsider
+whether Markdown is the right format for that content.
+
+```markdown
+# Good
+Set the element to `<Private>False</Private>`.
+
+# Bad
+<Private>False</Private>
+```
+
 ### Shell commands: one command per block unless they are a sequence
 
 ```markdown
@@ -238,8 +379,26 @@ have only one column, or for prose that has been forced into cells.
 
 ```markdown
 | Symptom | Likely cause | Fix |
-|---|---|---|
+| --- | --- | --- |
 | App hangs | Missing flush=True | Add flush=True to all print calls |
+```
+
+### Table separator row style
+
+The separator row (second row in any table) must use spaces inside the
+pipes: `| --- | --- | --- |`. The compact form `|---|---|---|` is not
+valid in all renderers and will fail markdown linters.
+
+```markdown
+# Good
+| Symptom | Likely cause | Fix |
+| --- | --- | --- |
+| App hangs | Missing flush=True | Add flush=True |
+
+# Bad
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| App hangs | Missing flush=True | Add flush=True |
 ```
 
 ### Keep cell content short
@@ -249,9 +408,83 @@ paragraph, not a table. Extract it.
 
 ### Alignment pipes
 
-Use consistent pipe alignment. Left-align all columns unless the content
-is numeric, in which case right-align. Do not obsess over perfect visual
-alignment in source — rendered output is what matters.
+Use `:---`, `---:`, or `:---:` in the separator row to control text
+alignment within a column. Left-align text columns, right-align numeric
+columns. This is about content alignment, not pipe position.
+
+### Table column style must be consistent
+
+Choose one pipe style and apply it to every row in the table — header,
+separator, and all data rows:
+
+- **Compact** (default): single space inside each pipe throughout —
+  `| content |` — separator uses `| --- |`.
+- **Aligned**: all pipe positions align vertically across every row;
+  separator dashes pad to match column width.
+
+Never mix styles in the same table. The most common mistake is using
+padded dashes in the separator while leaving data rows unpadded.
+
+```markdown
+# Good — compact, consistent across all rows
+| System | Purpose | Auth model |
+| --- | --- | --- |
+| AutoCAD | Drawing reads | API key |
+
+# Good — aligned, consistent across all rows
+| System   | Purpose       | Auth model |
+| -------- | ------------- | ---------- |
+| AutoCAD  | Drawing reads | API key    |
+
+# Bad — aligned separator, unpadded data rows
+| System | Purpose | Auth model |
+| ------ | ------- | ---------- |
+| AutoCAD | Drawing reads | API key |
+```
+
+### Table column count must be consistent
+
+Every row in a table — header, separator, and all data rows — must have the same number of cells. A row with too few cells produces empty cells that may break alignment. A row with too many cells has the extra data silently dropped by most renderers.
+
+```markdown
+# Good — every row has 3 cells
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| App hangs | Missing flush=True | Add flush=True |
+
+# Bad — data row has only 2 cells (third cell missing)
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| App hangs | Missing flush=True |
+
+# Bad — data row has 4 cells (extra cell dropped silently)
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| App hangs | Missing flush=True | Add flush=True | Extra data |
+```
+
+Count the pipes when writing or reviewing tables. Header column count = separator cell count = every data row cell count.
+
+### No multiple spaces inside table cells
+
+Each cell must have exactly one space between the pipe and the cell
+content: `| content |`. Do not use extra spaces to pad cell width
+visually — the renderer handles column widths.
+
+A cell with no space adjacent to the pipe (`|content|`) is also a
+violation — always include exactly one space on each side.
+
+```markdown
+# Good
+| Store | Role | Access layer |
+| --- | --- | --- |
+| database | read-write | repository layer |
+
+# Bad — excessive spacing and missing space before last cell
+| Store                 | Role     | Access layer     |
+| --- | --- | --- |
+| database              | read-write   | repository layer |[file]|
+```
 
 ---
 
@@ -282,6 +515,28 @@ specific GitHub URL.
 
 # Bad
 [AGENTS.md](https://github.com/chamber-19/Foundry/blob/main/AGENTS.md)
+```
+
+### No bare URLs
+
+A bare URL (`https://example.com`) is not a proper Markdown link. Most
+renderers do not auto-link bare URLs, and linters flag them as
+`no-bare-urls` violations.
+
+Wrap every URL in Markdown link syntax with descriptive link text. If
+the URL itself must be visible (for reference or copying), use it as the
+link text rather than leaving it bare.
+
+```markdown
+# Good
+See the [Rust reference](https://doc.rust-lang.org/stable/) for syntax details.
+The Cargo registry lives at [crates.io](https://crates.io).
+
+# Also acceptable — URL as link text when the destination is the point
+Install from [https://rustup.rs](https://rustup.rs).
+
+# Bad — bare URL, not wrapped
+See https://doc.rust-lang.org/stable/ for syntax details.
 ```
 
 ---
@@ -393,6 +648,90 @@ Prefer wrapping prose at 80–100 characters per line in source. This
 makes diffs readable and works in terminal editors. Do not hard-wrap code
 blocks — let them run long.
 
+### No trailing spaces
+
+Trailing spaces (spaces after the last visible character on a line) are
+invisible in editors but cause `no-trailing-spaces` linter failures. Some
+Markdown parsers also interpret two trailing spaces as a hard line break,
+creating invisible formatting that is hard to diagnose.
+
+Configure your editor to trim trailing whitespace on save. Do not use
+two trailing spaces as a line-break mechanism — use a new paragraph
+instead.
+
+---
+
+## Accessibility
+
+Markdown rendered on GitHub is read by engineers using screen readers, keyboard navigation, and assistive technology. These rules are not optional polish — they affect whether the content is usable.
+
+### Images must have descriptive alt text
+
+Every image needs alt text that conveys what the image shows. Empty alt text (`![]()`) is only acceptable for purely decorative images.
+
+```markdown
+# Good
+![Diagram showing Tauri command flow from React UI through Rust shell to Python sidecar](docs/command-flow.png)
+
+# Bad — filename, not a description
+![command-flow-diagram-v2.png](docs/command-flow.png)
+
+# Bad — empty
+![](docs/command-flow.png)
+```
+
+Rules for alt text:
+
+- Describe what the image shows, not what it is ("screenshot of" is acceptable)
+- Do not prefix with "image of" — screen readers announce that automatically
+- Include any text visible in the image
+- For charts or diagrams, summarise the data or relationship being shown
+- Keep it under two sentences; longer descriptions belong in a `<details>` block below the image
+
+### Emoji: use sparingly, never as bullet markers
+
+Screen readers read every emoji name aloud in full. Three emoji in a row becomes "rocket sparkles fire" spoken verbatim. Rules:
+
+- Never use emoji as bullet points or list markers — use proper Markdown list syntax (`-`, `*`, `1.`)
+- Never use emoji to convey meaning that is not also in the text
+- Never use multiple consecutive emoji
+- One emoji per paragraph at most, and only when it adds genuine context
+
+```markdown
+# Bad — emoji as bullets
+🔧 Install dependencies
+🚀 Run the build
+✅ Verify the output
+
+# Good
+- Install dependencies
+- Run the build
+- Verify the output
+```
+
+### Links must not open in a new tab
+
+Do not use `target="_blank"` in Markdown links. Markdown does not support it natively; if you are writing raw HTML links in a `.md` file for this reason, stop. Opening links in a new tab disorients screen reader users and breaks keyboard navigation expectations.
+
+### Bold and italic are not announced by screen readers
+
+Screen readers typically do not announce emphasis styling. Do not rely on bold or italic to convey critical information — write it in the text itself.
+
+```markdown
+# Bad — the warning depends on visual styling
+Run the command. **Do not run this as administrator.**
+
+# Good — the warning is in the text regardless of rendering
+Run the command. Running as administrator will corrupt the token store.
+```
+
+### Multimedia needs captions and transcripts
+
+- Provide captions for all videos
+- Provide transcripts for all recorded audio
+- Do not auto-play audio or video
+- Pause animated images on page load if possible
+
 ---
 
 ## Failure modes — what bad Markdown looks like
@@ -408,7 +747,21 @@ blocks — let them run long.
 | Headings used as bold text | Author unfamiliar with heading semantics | Replace with bold or a proper section heading |
 | File starts with a paragraph | No title heading | Add `#` title as first line |
 | Mixed list grammar | Items not edited for parallelism | Rewrite all items to the same grammatical form |
-| Language identifier missing from code block | Skipped for speed | Add `bash`, `python`, `rust`, etc. |
+| Language identifier missing from code block | Skipped for speed | Add `bash`, `python`, `rust`, etc. — never leave the fence blank |
+| Code block runs into surrounding paragraph | No blank line before or after the fence | Add a blank line above the opening ` ``` ` and below the closing ` ``` ` |
+| List runs directly into preceding paragraph | No blank line before first bullet | Add a blank line between the paragraph and the list |
+| Table renders as plain text or breaks in some tools | Separator row uses `\|---\|` without spaces | Change to `\| --- \|` with spaces inside every pipe |
+| Bare URL in file | URL not wrapped in link syntax | Wrap as `[descriptive text](url)` |
+| Raw HTML tag renders or breaks layout | HTML element not in backticks | Wrap tag in backticks: `` `<Tag>` `` |
+| Trailing whitespace causes linter failure | Editor not trimming whitespace | Configure editor to trim trailing spaces on save |
+| Same heading appears more than once | Two sections share an identical label | Add context to differentiate, or demote to `###` subsection |
+| Space inside `_` or `*` renders as literal character | Code identifier with trailing `_` not in backticks | Wrap identifiers like `` `RELAY_` `` in backticks |
+| Second `#` heading in the file | `single-h1` violation — only one document title per file | Demote to `##` or merge content into the title section |
+| Heading jumps from `##` to `####` | `heading-increment` violation — level skipped | Insert the missing `###` level or restructure the document |
+| Table pipes don't align vertically with header | Aligned separator mixed with unpadded data rows | Pick one style: all rows compact (`\| --- \|`) or all rows aligned (`\| -------- \|`) |
+| Table row has fewer cells than the header | Missing cell — likely a forgotten pipe | Count pipes; every row must match header column count |
+| Table row has more cells than the header | Extra data silently dropped by renderer | Remove extra cells or add a column to the header |
+| Extra spaces inside table cells | Cell content padded with multiple spaces for visual alignment | Use exactly one space on each side of cell content — `\| content \|` — never `\| content              \|` |
 
 ---
 
@@ -427,3 +780,17 @@ blocks — let them run long.
 - [ ] No exclamation points
 - [ ] No marketing language
 - [ ] Tone is direct and active voice
+- [ ] Images have descriptive alt text (not filenames, not empty)
+- [ ] No emoji used as bullet points or list markers
+- [ ] Critical information is stated in text, not conveyed only through bold or italic
+- [ ] Every list has a blank line before the first item and after the last
+- [ ] Every fenced code block has a blank line above and below it
+- [ ] Every fenced code block has a language identifier — never a bare ` ``` `
+- [ ] Table separator rows use `| --- |` style (spaces inside pipes), not `|---|`
+- [ ] No bare URLs — all external links use `[text](url)` syntax
+- [ ] No raw HTML tags outside code blocks — XML/HTML literals are wrapped in backticks
+- [ ] No trailing spaces on any line
+- [ ] All headings are unique — no duplicate heading text in the file
+- [ ] No spaces inside emphasis markers — identifiers with trailing `_` or `*` are in backticks
+- [ ] Table column style is consistent — header, separator, and data rows all use compact or all use aligned; never mixed
+- [ ] Table cells have exactly one space inside each pipe — no extra padding spaces inside cells

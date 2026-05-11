@@ -1,37 +1,290 @@
-VBA/EXCEL SKILL
-Mental model
+# Excel Formatting and Advanced Features Skill
 
-VBA (Visual Basic for Applications) scripts run inside the context of Microsoft Excel. Code is organised into modules (standard, class or form), and macros are executed by user interactions such as button clicks or workbook events. Excel exposes an object model where Workbooks contain Worksheets, which contain Ranges (cells). Macros can manipulate these objects to automate repetitive tasks.
+Use this skill when building Excel workbooks that need professional formatting, interactive controls (buttons, dropdowns, sliders), conditional formatting, charts, or VBA automation. The goal is workbooks that are clear, robust, and designed to be used by people who did not build them.
 
-In Chamber 19, the IFA‑IFC‑Checklist workbook implements stage‑based checklists for engineering submittals. Macros validate the completion of checklist items, manage stage transitions (30 %, 60 %, 90 % IFA and IFC), export the workbook to PDF, and update status fields. Because these macros modify documents used in production, safety and backup discipline are paramount.
+---
 
-Non‑negotiable patterns
-Implement a stage submit validation sequence for each stage (30 %, 60 %, 90 %, IFC). Before marking a stage as submitted, confirm that all required checklist rows have Status = "Complete", prompt the user, save a timestamped backup copy, and then write the submission metadata (date, initials) into the workbook.
-Use structured error handling: at the top of each procedure, add On Error GoTo ErrorHandler, and implement an ErrorHandler: section at the end of the procedure. In the error handler, log the error (e.g. write to a hidden sheet), reset Application.EnableEvents = True, display a message to the user and exit gracefully.
-When dynamically creating ribbon buttons or form controls, always remove or hide them when they are no longer needed. Rebuilding the UI without cleanup leads to duplicate controls.
-Save a working copy before performing bulk operations such as PDF export or bulk status updates. Do not operate directly on the master workbook—always duplicate it with a _workcopy suffix and run the macro on that copy.
-Never use On Error Resume Next to suppress errors. Always handle specific errors or fail loudly so that mistakes are caught early.
-Use Option Explicit at the top of every module to force explicit variable declarations.
-Common objects and functions
-Purpose	Object/Function	Notes
-Workbook events	Workbook_Open, Workbook_BeforeClose	Initialise ribbon and perform cleanup when opening/closing
-Range manipulation	Range, Cells, Offset	Read/write cell values and iterate over rows
-Dialogs	Application.FileDialog, MsgBox, InputBox	Prompt users for files and confirmations
-PDF export	Worksheet.ExportAsFixedFormat	Save a worksheet or workbook as PDF
-Date/time	Now(), Format()	Record submission timestamps
-Failure modes
-Symptom	Likely cause	Fix
-Duplicate buttons appear after running macros	Buttons are added on each macro run without removal	Remove existing buttons before adding new ones or toggle visibility instead of creating new controls
-Macro silently fails with no output	On Error Resume Next swallows errors	Replace with structured error handling and inspect the error in Err.Description
-Workbook becomes read‑only after macro run	Macro opened a file without closing or saved over the original	Ensure all workbooks are closed (Workbook.Close SaveChanges:=True) and write operations occur on working copies
-Checklist rows remain incomplete but stage submitted	Validation omitted or incorrectly implemented	Double‑check that the validation loop iterates over all rows and checks each required column
-Quick reference commands
-Open the VBA editor: Press Alt + F11.
-Run a macro: Press F5 inside the module or assign the macro to a button in the Ribbon.
-Toggle breakpoints: Click in the left margin or press F9.
-Step through code: Use F8 to step into lines and inspect variables in the Immediate window (Ctrl + G).
-Save and rebuild: After modifying code, save the workbook and ensure macros are enabled. To rebuild the unified workbook programmatically, run the build scripts in the repository (see the repository README).
-Chamber 19 specifics
-The workbook uses dedicated sheets for 30 %, 60 %, 90 % IFA and IFC checklists with defined columns (Discipline, Item Description, Responsible Party, Priority, Status, Due Date, Remarks, Document Reference, Verified By). Do not modify the schema without updating the macros.
-The ribbon adds buttons for stage submission, export and filtering. If you extend the ribbon, follow the existing patterns for cleanup and event wiring.
-Macros must never run on production drawings without creating a backup; this rule exists because previous versions inadvertently overwrote client deliverables.
+## Design principles
+
+Good Excel design makes data readable at a glance and workflows impossible to break by accident. Decide on structure before touching formatting.
+
+- **Structure first.** Model the data correctly before applying any formatting.
+- **One table per concern.** Do not mix data sources or calculation types in a single block.
+- **Named ranges over cell addresses.** `=SUM(Rebar_Lengths)` is maintainable; `=SUM(D4:D203)` is not.
+- **Protect by default.** Lock formula cells; leave only intentional input cells unlocked.
+- **Avoid merged cells in data ranges.** They break sorting, filtering, and formula references. Use "Centre Across Selection" instead for visual centering.
+- **Use Excel Tables (`Ctrl+T`).** They auto-expand, support structured references, and enable consistent formatting with zero extra work.
+
+---
+
+## Color, typography, and visual hierarchy
+
+### Color palette
+
+Use a restrained palette — three or four colors maximum. Stick to the workbook's theme colors so the file looks consistent in any Office version.
+
+| Role | Recommendation |
+| --- | --- |
+| Header background | Dark solid color from theme (e.g. dark blue, charcoal) |
+| Header text | White or near-white, bold |
+| Alternating rows | Very light tint of the header color (5–10% opacity) |
+| Input cells | Light yellow or unshaded with a visible border |
+| Formula cells | Locked, shaded to signal they are not editable |
+| Totals / summary rows | Slightly darker shade, top border, bold |
+| Alerts / errors | Red background with white text — reserve this for genuine errors |
+
+### Typography
+
+- Body text: Calibri 11 or Arial 10 — default Office fonts render cleanly at all zoom levels.
+- Headers: Bold, 1–2pt larger than body.
+- Never use more than two font families in a single workbook.
+- Row height: 18–22pt feels spacious and is easy to click. Avoid the default cramped 15pt for data users will actually read.
+
+### Borders and whitespace
+
+- Use thin interior borders and a medium outer border to define table boundaries.
+- Leave one empty column on the left of any significant table — it gives the sheet breathing room.
+- Freeze the top row (and left column if needed) for any table taller than a screen.
+
+---
+
+## Conditional formatting
+
+Use conditional formatting to make patterns visible without extra columns or manual maintenance.
+
+```text
+Common patterns:
+
+Data bars        — visualise magnitude in a column (sales, lengths, scores)
+Color scales     — 3-color gradient to show high/medium/low across a range
+Icon sets        — traffic lights or arrows for status columns
+Rule-based       — highlight cells above threshold, duplicate values, or blanks
+```
+
+**Rules for conditional formatting rules:**
+
+- Apply to the narrowest range that makes sense — avoid applying to entire columns.
+- Name your rules clearly if using formula-based conditions.
+- Order rules deliberately — Excel evaluates from top to bottom and stops at the first match (unless "stop if true" is off).
+- Test at different zoom levels — icon sets and data bars shrink at low zoom.
+
+---
+
+## Form controls and buttons
+
+Excel has two families of controls: **Form Controls** (simpler, VBA-friendly) and **ActiveX Controls** (more capable, more fragile). Use Form Controls unless you specifically need ActiveX features.
+
+### Inserting a button (Form Control)
+
+1. Developer tab → Insert → Form Controls → Button.
+2. Draw on the sheet; the "Assign Macro" dialog appears.
+3. Assign an existing macro or click New to create one.
+4. Right-click the button → Edit Text to label it clearly.
+5. Format the button: right-click → Format Control → Font/Colors.
+
+### Inserting a dropdown (Form Control)
+
+1. Developer tab → Insert → Form Controls → Combo Box.
+2. Draw on the sheet.
+3. Right-click → Format Control → Control tab:
+   - **Input range**: the list of values (use a named range).
+   - **Cell link**: the cell that receives the selected index (1-based).
+4. Use `INDEX(list, linked_cell)` to convert the index into the selected value.
+
+### Other useful controls
+
+| Control | Use case |
+| --- | --- |
+| Spin Button | Increment/decrement a numeric input cell |
+| Scroll Bar | Adjust a value across a range with a slider |
+| Check Box | Toggle a boolean flag linked to a cell (`TRUE`/`FALSE`) |
+| Option Button (Radio) | Mutually exclusive selection within a group box |
+| List Box | Multi-select from a visible list |
+
+### Sizing and alignment
+
+- Hold `Alt` while drawing a control to snap it to cell grid lines.
+- Group related controls (select all → right-click → Group) so they move together.
+- Set consistent sizes: select multiple controls → Format Control → Size tab.
+
+---
+
+## VBA for button actions
+
+Keep macros short, focused, and safe. Each button should do one clearly named thing.
+
+```vb
+Option Explicit
+
+Sub ExportToPDF()
+    ' Validate before acting
+    If Not ValidateInputs() Then Exit Sub
+
+    Dim wb As Workbook
+    Dim ws As Worksheet
+    Set wb = ThisWorkbook
+    Set ws = wb.Sheets("Report")
+
+    Dim outputPath As String
+    outputPath = wb.Path & "\output\" & Format(Now, "YYYY-MM-DD") & "_Report.pdf"
+
+    On Error GoTo ErrorHandler
+    ws.ExportAsFixedFormat Type:=xlTypePDF, Filename:=outputPath, _
+        Quality:=xlQualityStandard, IncludeDocProperties:=True, _
+        IgnorePrintAreas:=False, OpenAfterPublish:=False
+
+    MsgBox "Exported to: " & outputPath, vbInformation
+    Exit Sub
+
+ErrorHandler:
+    MsgBox "Export failed: " & Err.Description, vbCritical
+End Sub
+```
+
+**VBA non-negotiables:**
+
+- `Option Explicit` at the top of every module.
+- `On Error GoTo ErrorHandler` at the top of every procedure that touches files, external data, or protected sheets.
+- Never use `On Error Resume Next` to suppress errors.
+- Always call `Application.EnableEvents = True` in the error handler if you disabled it.
+- Save a timestamped backup before any bulk operation that modifies cell data.
+
+---
+
+## Data validation
+
+Data validation prevents bad input at the cell level without requiring VBA.
+
+```text
+Types:
+  Whole Number     — restrict to integers within a range
+  Decimal          — restrict to numeric values with precision
+  List             — dropdown from a range or comma-separated values
+  Date / Time      — restrict to valid dates or times
+  Text Length      — enforce minimum/maximum character count
+  Custom           — formula-based rule (e.g. must start with "R3P-")
+```
+
+Best practices:
+
+- Source dropdown lists from named ranges on a dedicated `_Lists` sheet.
+- Always add an Input Message (tooltip) explaining what is expected.
+- Set Error Alert to Stop for critical fields; Warning for advisory constraints.
+- Use `IFERROR` in formulas that depend on validated cells to handle out-of-range edge cases gracefully.
+
+---
+
+## Charts and sparklines
+
+### Chart design rules
+
+- Title every chart with a statement, not a label. "Rebar length by layer (ft)" is a label; "Foundation layer accounts for 42% of total rebar" is a statement.
+- Remove chart junk: gridlines at low opacity only, no border, no background fill.
+- Use consistent colors between charts in the same workbook — match the palette defined above.
+- Place charts on the same sheet as their source data unless the workbook has a dedicated dashboard sheet.
+
+### Sparklines
+
+Sparklines (Insert → Sparklines) are mini charts inside a single cell — useful for trend columns in summary tables.
+
+- Use Line sparklines for trends over time.
+- Use Column sparklines for comparisons.
+- Set consistent axis min/max across a group so sparklines are comparable.
+- Show the high/low point markers for context.
+
+---
+
+## Named ranges and structured references
+
+```vb
+' Create a named range via VBA
+ThisWorkbook.Names.Add Name:="Rebar_Lengths", _
+    RefersTo:=Sheets("Data").Range("D4:D203")
+
+' Reference it in a formula
+' =SUM(Rebar_Lengths)
+' =AVERAGE(Rebar_Lengths)
+' =COUNTIF(Rebar_Lengths, ">0")
+```
+
+Use Excel Tables for any data that will grow:
+
+```text
+Ctrl+T              — convert range to Table
+Table[Column]       — structured reference, auto-expands
+Table[@Column]      — reference to current row only (useful in calculated columns)
+```
+
+---
+
+## Sheet protection
+
+Protect sheets to separate input areas from formula areas.
+
+```vb
+Sub ProtectInputSheet()
+    Dim ws As Worksheet
+    Set ws = ThisWorkbook.Sheets("Input")
+
+    ' Unlock input cells before protecting
+    ws.Range("InputCells").Locked = False
+
+    ws.Protect Password:="", _
+        UserInterfaceOnly:=True, _   ' allows VBA to still write to protected cells
+        AllowSorting:=True, _
+        AllowFiltering:=True, _
+        DrawingObjects:=True, _
+        Contents:=True
+End Sub
+```
+
+`UserInterfaceOnly:=True` is essential if macros need to write to protected sheets — without it, you must unprotect and re-protect around every write operation.
+
+---
+
+## Print setup
+
+```vb
+Sub ConfigurePrintArea()
+    With ActiveSheet.PageSetup
+        .PrintArea = "$A$1:$P$50"
+        .Orientation = xlLandscape
+        .FitToPagesWide = 1
+        .FitToPagesTall = False
+        .PaperSize = xlPaperA4
+        .LeftMargin = Application.InchesToPoints(0.5)
+        .RightMargin = Application.InchesToPoints(0.5)
+        .TopMargin = Application.InchesToPoints(0.75)
+        .BottomMargin = Application.InchesToPoints(0.75)
+        .CenterHorizontally = True
+        .PrintTitleRows = "$1:$2"   ' repeat header rows on each page
+    End With
+End Sub
+```
+
+---
+
+## Failure modes
+
+| Symptom | Likely cause | Fix |
+| --- | --- | --- |
+| Duplicate buttons appear after running macros | Controls added on each macro run without cleanup | Remove or hide existing controls before creating new ones |
+| Macro silently fails | `On Error Resume Next` swallowing errors | Replace with `On Error GoTo ErrorHandler`; inspect `Err.Description` |
+| Conditional formatting stops applying | Range shifted after row inserts | Redefine the rule range; use Table-relative references |
+| Dropdown shows index number, not value | Cell link returns index, not the list item | Use `=INDEX(ListRange, LinkedCell)` to convert |
+| Merged cells break sort/filter | Data range contains merged cells | Replace merges with "Centre Across Selection" |
+| VBA can't write to protected sheet | `UserInterfaceOnly` not set | Add `UserInterfaceOnly:=True` to the `Protect` call |
+
+---
+
+## Quick reference
+
+```text
+Ctrl+T              — create a Table from a range
+Ctrl+Shift+F3       — create named ranges from selection labels
+Alt+F11             — open VBA editor
+F5 (in VBA editor)  — run macro
+F8 (in VBA editor)  — step through code line by line
+Ctrl+G (in VBA)     — open Immediate window for quick evaluation
+Alt (while drawing) — snap control to cell grid
+```
