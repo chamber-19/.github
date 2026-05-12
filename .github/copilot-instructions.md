@@ -175,6 +175,23 @@ No purple gradients on white. No Inter, Roboto, or Arial. No exclamation
 points. Tone: warm, matter-of-fact, engineering-grade. Never
 marketing-driven.
 
+## Accessibility — mandatory for all React UIs
+
+**MUST:** Every `<input>`, `<select>`, and `<textarea>` element must have both an `id` and a `name` attribute. Use `id` for `<label htmlFor>` association. Add `aria-label` when no visible label exists.
+
+```tsx
+// CORRECT
+<input id="course-search" name="course-search" aria-label="Search courses" ... />
+<select id="filter-institution" name="filter-institution" aria-label="Filter by institution" ...>
+
+// WRONG — fails screen reader association and browser autofill hint
+<input value={...} onChange={...} placeholder="Search courses" />
+```
+
+**MUST NOT:** Use `<span onClick>` or `<div onClick>` as interactive controls. Use `<button>` for clickable actions — it is keyboard-focusable and announced correctly by screen readers.
+
+**MUST NOT:** Write `outline: none` without a companion `:focus-visible` rule that provides an equivalent visible ring.
+
 ---
 
 ## Skills registry

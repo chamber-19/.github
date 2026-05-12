@@ -14,6 +14,40 @@ When you uncover a problem or learn a lesson, add an entry here with evidence (c
 
 ## Incidents
 
+### Launcher-managed backend distribution replaced direct backend install flow
+
+**Status:** `[Active]`
+
+**Description:** Chamber 19 moved from direct per-backend install/update expectations to launcher-managed backend delivery. The launcher now owns backend pinning and lifecycle through GitHub Releases metadata (`backends.json`) plus release automation. A backend release can dispatch an event that bumps launcher backend pins and cuts a launcher release automatically.
+
+**Why this is important:** This is a major architecture and operator-workflow shift. Users should not be treated as directly installing backend executables anymore; the launcher is the distribution/control plane.
+
+**Evidence:**
+
+- `launcher` changelog documents the shift in `## [0.2.0]` (backend manager, updater, backend-released automation): `launcher/CHANGELOG.md`.
+- Backend-to-launcher release handshake automation is implemented in `launcher/.github/workflows/backend-released.yml`.
+- Transmittal backend release dispatches `backend-released` to launcher in `Transmittal-Builder/.github/workflows/release.yml`.
+- Runtime backend pin model exists in `launcher/frontend/src-tauri/backends.json` and is consumed by `launcher/frontend/src-tauri/src/backend_manager.rs`.
+
+**Outcome:** Treat launcher as the required distribution path for backend updates. Future docs and runbooks should avoid language implying manual backend installer lifecycle for end users.
+
+---
+
+### Launcher branch-state mismatch can hide release-automation reality
+
+**Status:** `[Active]`
+
+**Description:** During verification, key launcher automation files existed on the local feature branch/tagged line (`v0.2.0`) but were not present on local `main`. This can create false confidence when reading local files without branch context.
+
+**Evidence:**
+
+- Local branch `chore/feat--rename-crate-to-launcher,-add-backend-manager-+-GitHub-Releases-self-update,-remove-G---drive` contains `backend-released.yml`, `backends.json`, and `backend_manager.rs`.
+- Local `main` lacked these paths at verification time (`git show main:<path>` failed for all three).
+
+**Outcome:** Any statement that release automation "is live" must include branch/default-branch verification, not only working-tree inspection.
+
+---
+
 ### Tauri sidecar hangs due to buffered output
 
 **Status:** `[Promoted]`
