@@ -12,6 +12,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 > **Format:** New entries use date-first grouping — `### YYYY-MM-DD` at top, then `#### Added` / `#### Changed` / etc. under it. Older entries below use the legacy category-first format and are not being retrofitted.
 
+### 2026-05-14
+
+#### Added
+
+- `.github/workflows/reusable-css-discipline.yml` — new reusable workflow that consumer repos invoke via `uses: chamber-19/.github/.github/workflows/reusable-css-discipline.yml@main`. Runs `@chamber-19/stylelint-config` against the consumer's CSS/SCSS/Sass/Less files with `--max-warnings 0` and `--formatter github` so violations render as inline `::error` annotations on the PR's Files Changed tab. Includes a failure-footer step that posts a Markdown summary with common-fix guidance and a pointer back to `docs/skills/CSS_DISCIPLINE.md`. Inputs: `node-version`, `working-directory`, `css-glob`, `gh-packages-scope`, `allow-empty-input`. Permissions: `contents: read`, `packages: read` (the latter for GH Packages auth to install `@chamber-19/stylelint-config`).
+
 ### 2026-05-10
 
 #### Added
