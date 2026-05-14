@@ -12,6 +12,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 > **Format:** New entries use date-first grouping — `### YYYY-MM-DD` at top, then `#### Added` / `#### Changed` / etc. under it. Older entries below use the legacy category-first format and are not being retrofitted.
 
+### 2026-05-14
+
+#### Added
+
+- `docs/skills/CSS_DISCIPLINE.md` — new skill governing CSS/SCSS/Sass/Less and inline `style` objects across all Chamber 19 repos. Covers the `--ch-*` token contract, the `_theme.override.css` extension pattern, the `!important` ban, the naked-element-selector ban, right/wrong examples, build-blocking enforcement via `@chamber-19/stylelint-config`, and the AI push-back contract. Aggressively keyword-loaded first paragraph for reliable auto-trigger.
+- `docs/skills/UI_UX_DISCIPLINE.md` — new skill governing any change that affects what a human sees, hears, or interacts with in a Chamber 19 product. Covers toolkit primitive reuse contract (no duplicating Sidebar/TopBar/ActivationGate/etc. in consumer apps), theme governance with the consent-gated custom theming flow, microcopy rules (warm, matter-of-fact, engineering-grade — no exclamations), WCAG AA accessibility contract, and the AI push-back contract.
+- `.github/instructions/css-discipline.instructions.md` — thin wrapper auto-applying CSS Discipline rules to `**/*.{css,scss,sass,less}` via `applyTo:` frontmatter.
+- `.github/instructions/ui-ux-discipline.instructions.md` — thin wrapper auto-applying UI/UX Discipline rules to `**/*.{tsx,jsx,ts,js,html,vue,css,scss,sass,less}`.
+- `.github/copilot-instructions.md` — new "UI and CSS discipline — load before editing" section with explicit MUST directives, push-back examples (no `#fff`, no toolkit primitive duplication, no `!important` band-aid, no marketing tone), and a no-comply-then-warn rule.
+- `.github/copilot-instructions.md` skills registry — two new rows for `CSS_DISCIPLINE.md` and `UI_UX_DISCIPLINE.md`.
+
+#### Changed
+
+- `.github/copilot-instructions.md` — added a standard Chamber 19 new-app AI agent intake flow: mandatory purpose questions, per-app memory isolation rule, required starter scaffold outputs, and default v7 mascot template shortlist (Scarlet Jackal, Ash Golem, Forge Bear, Rose Moth, Graphite Owl).
+- `docs/skills/AI_READY.md` — added Chamber 19 extension section for repeatable new-app AI agent intake and starter scaffold contract (manifest + empty per-app datastore placeholders + `AGENT_PURPOSE.md`), with explicit per-app memory-only requirement.
+
 ### 2026-05-10
 
 #### Added

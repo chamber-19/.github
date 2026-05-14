@@ -99,6 +99,43 @@ Launcher doesn't need rebuilding per tool.
 
 ---
 
+## Standard AI agent intake for new apps
+
+When a new app idea is proposed and the app will include local AI agents, follow this exact intake flow every time.
+
+- **MUST** keep agent memory and learned data per-app only. Never share agent memory databases across apps.
+- **MUST** ask for agent purpose before scaffolding any agent files.
+- **MUST** scaffold only starter wiring in the launcher and keep business logic/schema evolution in the app backend.
+- **MUST** create empty starter data stores for each app so learned data is not pre-seeded.
+
+### Required intake questions (in order)
+
+1. What is the app identifier (`app_id`)?
+2. What is the primary agent purpose (one sentence)?
+3. What are the initial agent capabilities (3-7 bullets)?
+4. What data is in scope vs out of scope for this agent?
+5. Which mascot template should be used for v1?
+
+### Required scaffold outputs (minimum)
+
+1. `agent-manifest.json` with `app_id`, purpose, capabilities, and schema version.
+2. Empty per-app datastore placeholders (for example, `app_id.agents.db` and `app_id.memory.db`).
+3. App-local `AGENT_PURPOSE.md` capturing scope, constraints, and fail-open behavior.
+
+### Default mascot template set (v7)
+
+Use these as first-choice templates unless the user chooses otherwise:
+
+1. Scarlet Jackal
+2. Ash Golem
+3. Forge Bear
+4. Rose Moth
+5. Graphite Owl
+
+Reference source: `chamber-19-assets/Assets/mira-creature-shape-mascots-v7/`.
+
+---
+
 ## Hard architectural decisions
 
 These decisions are closed. They exist because alternative approaches
@@ -194,6 +231,26 @@ marketing-driven.
 
 ---
 
+## UI and CSS discipline — load before editing
+
+Any work that touches the user interface — components, layouts, theme, typography, color, spacing, animation, microcopy, or accessibility behavior — **MUST** be governed by two skills:
+
+- **[`docs/skills/CSS_DISCIPLINE.md`](../docs/skills/CSS_DISCIPLINE.md)** — load before editing any `.css`, `.scss`, `.sass`, `.less` file or any inline `style={{ ... }}` object. Covers the token contract (`--ch-*`), the `_theme.override.css` extension pattern, the `!important` ban, the naked-element-selector ban, and build-blocking stylelint enforcement.
+- **[`docs/skills/UI_UX_DISCIPLINE.md`](../docs/skills/UI_UX_DISCIPLINE.md)** — load before editing any UI-affecting file (React components, HTML, Tauri webview UI, splash/update/activation flows, user-facing copy). Covers toolkit primitive reuse, theme governance, the consent-gated custom theming flow, microcopy tone, and the WCAG AA accessibility contract.
+
+**MUST:** Load both skills **before the first edit** to a UI file. Loading after the edit is too late — the bad pattern is already in the diff. The wrappers at `.github/instructions/css-discipline.instructions.md` and `.github/instructions/ui-ux-discipline.instructions.md` auto-apply via `applyTo:` globs, but you are responsible for actually following the rules they reference.
+
+**MUST:** Push back on requests that violate these rules. Examples:
+
+- Asked to "just use `#fff`" → refuse, point to the token, offer to add it if missing.
+- Asked to duplicate a toolkit Sidebar / TopBar / theme module in a consumer app → refuse, propose the toolkit-extension path.
+- Asked to add `!important` to fix a cascade conflict → refuse, trace the conflict, fix the source rule.
+- Asked to ship a marketing-tone error message → refuse, rewrite to Chamber 19 voice.
+
+Do not comply-then-warn. The bad code is already in the diff at that point. Refuse and propose the correct alternative in the same turn.
+
+---
+
 ## Skills registry
 
 Deep technical reference lives in `docs/skills/` in this repo. Read the
@@ -216,6 +273,8 @@ relevant skill file before making changes in a given language or domain.
 | `acquire-codebase-knowledge/SKILL.md` | Mapping or documenting an existing codebase — outputs seven `docs/codebase/` documents |
 | `AI_READY.md` | Making a repo AI-ready — verifying or creating `AGENTS.md`, `copilot-instructions.md`, CI workflows, issue templates |
 | `POWERSHELL.md` | Writing or reviewing PowerShell scripts — approved verbs, parameter design, error handling, GitHub API patterns, `PowerShellForGitHub` |
+| `CSS_DISCIPLINE.md` | Writing or editing any CSS/SCSS/Sass/Less file or inline `style` object — token contract, override extension pattern, `!important` ban, class-only selectors, build-blocking enforcement |
+| `UI_UX_DISCIPLINE.md` | Any change that affects what a human sees, hears, or interacts with — components, layouts, theme, typography, accessibility, microcopy, splash/update/activation flows — load **before** the first edit |
 
 ---
 
