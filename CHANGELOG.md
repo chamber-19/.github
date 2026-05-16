@@ -16,11 +16,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 #### Fixed
 
-- `.github/workflows/auto-pr-body-and-labels.yml` — preserved manual PR sections (`Why`, `Verification`, `Linked issue`) when auto-updating managed PR body content.
-- `.github/workflows/fix-biome.yml` and `.github/workflows/fix-tailwind-canonical-vars.yml` — checked out `chamber-19/.github` explicitly in reusable runs and invoked scripts from that checkout path.
-- `scripts/family-manifest.yml` — added `chamber-19-assets` and `vanguard` as `needs-curation` entries so family-table reconciliation passes with current org repo set.
-- `AGENTS.md`, `docs/pilots.md`, `.github/prompts/add-to-learning.prompt.md`, and `.github/instructions/learning.instructions.md` — removed broken machine-specific/workspace-specific references.
-- `docs/skills/CHANGELOG.md`, `docs/skills/BIOME.md`, and `docs/skills/acquire-codebase-knowledge/SKILL.md` plus acquire-codebase templates — corrected date-heading examples, stale path guidance, grammar, and Markdown table separator style.
+- `.github/workflows/fix-biome.yml` — replaced `printf` with heredoc to eliminate SC2016 (backtick in single-quoted string).
+- `.github/workflows/fix-tailwind-canonical-vars.yml` — replaced `printf` with heredoc to eliminate SC2016 (backtick in single-quoted strings, three occurrences).
+- `.github/workflows/lint-yaml.yml` — replaced unquoted `$(find ...)` with `mapfile` array to eliminate SC2046 (word splitting).
 
 ### 2026-05-10
 

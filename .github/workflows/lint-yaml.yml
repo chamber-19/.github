@@ -23,6 +23,11 @@ jobs:
 
       - name: Run yamllint
         run: |
+          mapfile -t yaml_files < <(find . \
+            -name "*.yml" -o -name "*.yaml" \
+            | grep -v node_modules \
+            | grep -v ".git/" \
+            | grep -v "vendor/")
           yamllint -d '{
             extends: default,
             rules: {
@@ -34,11 +39,7 @@ jobs:
             }
           }' \
             --no-warnings \
-            $(find . \
-              -name "*.yml" -o -name "*.yaml" \
-              | grep -v node_modules \
-              | grep -v ".git/" \
-              | grep -v "vendor/")
+            "${yaml_files[@]}"
 
   actionlint:
     name: actionlint (GitHub Actions syntax)
