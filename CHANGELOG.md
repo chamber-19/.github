@@ -12,6 +12,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 > **Format:** New entries use date-first grouping — `### YYYY-MM-DD` at top, then `#### Added` / `#### Changed` / etc. under it. Older entries below use the legacy category-first format and are not being retrofitted.
 
+### 2026-05-16
+
+#### Fixed
+
+- `.github/workflows/fix-biome.yml` — replaced `printf` with heredoc to eliminate SC2016 (backtick in single-quoted string).
+- `.github/workflows/fix-tailwind-canonical-vars.yml` — replaced `printf` with heredoc to eliminate SC2016 (backtick in single-quoted strings, three occurrences).
+- `.github/workflows/lint-yaml.yml` — replaced unquoted `$(find ...)` with `mapfile` array to eliminate SC2046 (word splitting).
+
 ### 2026-05-10
 
 #### Added
