@@ -38,10 +38,10 @@ This repo's housekeeping uses two foundational skills:
 - `docs/skills/acquire-codebase-knowledge/SKILL.md` — scan-then-document discipline for any repo audit. Drives the `docs/codebase/` template set.
 - `docs/skills/AI_READY.md` — pointer to John Papa's `ai-ready` skill for verifying any repo has the AI-discoverable artifact set (`AGENTS.md`, `copilot-instructions.md`, CI, issue templates, CHANGELOG).
 
-Additional skills are promoted into `docs/skills/` over time per the workspace-level `IMPLEMENTATION_PLAN.md`.
+Additional skills are promoted into `docs/skills/` over time through normal repo PR workflow.
 
 ## When in doubt
 
 1. Check `docs/memory.md` — institutional memory of incidents and closed decisions.
-2. Check the workspace-level `IMPLEMENTATION_PLAN.md` — current execution master.
+2. Check open issues/PRs in this repo for current execution context.
 3. Ask the user — direct, specific questions, not open-ended ones.

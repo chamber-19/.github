@@ -24,23 +24,23 @@ repos:
     architecture_status: desktop-shell
     last_verified: 2026-05-10
   - name: transmittal-builder
-    profile_role: "Standalone Tauri app for generating engineering transmittal packages"
-    copilot_role: "Tauri app with Python sidecar — engineering transmittal package generator"
-    stack: "Tauri 2.0, Rust, Python"
+    profile_role: "Backend service for engineering transmittal generation (invoked by launcher)"
+    copilot_role: "Python FastAPI backend service — engineering transmittal package generator"
+    stack: "Python, FastAPI"
     category: tool
     architecture_status: backend-service
     last_verified: 2026-05-10
   - name: Drawing-List-Manager
-    profile_role: "Standalone Tauri app for project drawing registers"
-    copilot_role: "Tauri app with Python sidecar — project drawing register"
-    stack: "Tauri 2.0, Rust"
+    profile_role: "Backend service for project drawing registers (invoked by launcher)"
+    copilot_role: "Python FastAPI backend service — project drawing register"
+    stack: "Python, FastAPI"
     category: tool
     architecture_status: backend-service
     last_verified: 2026-05-10
   - name: batch-fnr
-    profile_role: "Batch DXF Find-and-Replace — Tauri 2 desktop app with headless .NET AutoCAD sidecar"
-    copilot_role: "Batch DXF Find-and-Replace with headless .NET AutoCAD sidecar"
-    stack: "Tauri 2.0, Rust, React, .NET"
+    profile_role: "Backend service for batch DXF find-and-replace workflows"
+    copilot_role: "Backend service for batch DXF find-and-replace workflows"
+    stack: ".NET"
     category: tool
     architecture_status: backend-service
     last_verified: 2026-05-10
@@ -88,13 +88,29 @@ repos:
     architecture_status: reference-only
     last_verified: 2026-05-10
   - name: .github
-    profile_role: "TODO: curate whether this org-config repo should be listed in the public tools table"
-    copilot_role: "TODO: curate role copy for this repo in family-table generation"
+    profile_role: "Org-wide configuration hub: shared instructions, skills, workflows, and maintenance scripts"
+    copilot_role: "Org-wide configuration hub: shared instructions, skills, workflows, and maintenance scripts"
     stack: "Markdown, YAML"
     category: needs-curation
     status: needs-curation
     architecture_status: reference-only
     last_verified: 2026-05-10
+  - name: chamber-19-assets
+    profile_role: "TODO: curate role for chamber-19-assets"
+    copilot_role: "TODO: curate role for chamber-19-assets"
+    stack: "TODO"
+    category: needs-curation
+    status: needs-curation
+    architecture_status: reference-only
+    last_verified: 2026-05-16
+  - name: vanguard
+    profile_role: "TODO: curate role for vanguard"
+    copilot_role: "TODO: curate role for vanguard"
+    stack: "TODO"
+    category: needs-curation
+    status: needs-curation
+    architecture_status: reference-only
+    last_verified: 2026-05-16
 
 table_targets:
   profile:

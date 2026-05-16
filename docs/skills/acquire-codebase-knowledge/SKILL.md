@@ -130,7 +130,7 @@ Validation pass criteria:
 ## Anti-Patterns
 
 | ❌ Don't | ✅ Do instead |
-|---------|--------------|
+| --- | --- |
 | "Uses Clean Architecture with Domain/Data layers." (when no such directories exist) | State only what directory structure actually shows. |
 | "This is a Next.js project." (without checking `package.json`) | Check `dependencies` first. State what's actually there. |
 | Guess the database from a variable name like `dbUrl` | Check manifest for `pg`, `mysql2`, `mongoose`, `prisma`, etc. |
@@ -140,7 +140,7 @@ Validation pass criteria:
 
 ## Enhanced Scan Output Sections
 
-The `scan.py` script now produce the following sections in addition to the original output:
+The `scan.py` script now produces the following sections in addition to the original output:
 
 - **CODE METRICS** — Total files, lines of code by language, largest files (complexity signals)
 - **CI/CD PIPELINES** — Detected GitHub Actions, GitLab CI, Jenkins, CircleCI, etc.
@@ -155,7 +155,7 @@ Use these sections during Phase 2 to inform investigation questions and identify
 ## Bundled Assets
 
 | Asset | When to load |
-|-------|-------------|
+| --- | --- |
 | [`scripts/scan.py`](scripts/scan.py) | Phase 1 — run first, before reading any code (Python 3.8+ required) |
 
 | [`references/inquiry-checkpoints.md`](references/inquiry-checkpoints.md) | Phase 2 — load for per-template investigation questions |

@@ -18,11 +18,27 @@ function Assert-PowerShellVersion {
 }
 
 function Get-PythonCommand {
-    if (Get-Command -Name python3 -ErrorAction SilentlyContinue) {
+    function Test-PyYaml {
+        param(
+            [Parameter(Mandatory = $true)]
+            [string]$Command
+        )
+
+        try {
+            & $Command -c "import yaml" | Out-Null
+            return $true
+        }
+        catch {
+            Write-Verbose "Interpreter '$Command' cannot import PyYAML: $($_.Exception.Message)"
+            return $false
+        }
+    }
+
+    if ((Get-Command -Name python3 -ErrorAction SilentlyContinue) -and (Test-PyYaml -Command "python3")) {
         return "python3"
     }
 
-    if (Get-Command -Name python -ErrorAction SilentlyContinue) {
+    if ((Get-Command -Name python -ErrorAction SilentlyContinue) -and (Test-PyYaml -Command "python")) {
         return "python"
     }
 
@@ -286,7 +302,7 @@ import sys
 import yaml
 
 data = yaml.safe_load(sys.stdin.read())
-print(json.dumps(data))
+print(json.dumps(data, default=str))
 "@
 
     $pythonCommand = Get-PythonCommand
@@ -310,6 +326,23 @@ try {
 
     $manifestRaw = Get-Content -LiteralPath $ManifestPath -Raw
     $manifest = ConvertFrom-YamlCompat -Yaml $manifestRaw
+
+    if ($null -eq $manifest) {
+        throw "Manifest '$ManifestPath' did not parse into an object."
+    }
+
+    $hasReposKey = $false
+    if ($manifest -is [System.Collections.IDictionary]) {
+        $hasReposKey = $manifest.Contains("repos")
+    }
+    else {
+        $manifestPropertyNames = @($manifest.PSObject.Properties.Name)
+        $hasReposKey = "repos" -in $manifestPropertyNames
+    }
+
+    if (-not $hasReposKey) {
+        throw "Manifest '$ManifestPath' is missing required top-level key 'repos'."
+    }
 
     if (-not $manifest.repos -or $manifest.repos.Count -eq 0) {
         throw "Manifest '$ManifestPath' has no repos."

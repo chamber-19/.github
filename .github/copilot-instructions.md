@@ -40,7 +40,7 @@ When the change is **inside this repo** (not a consumer repo), additional rules 
 
 - **MUST** add an entry to [`CHANGELOG.md`](../CHANGELOG.md) under `## [Unreleased]` for every PR. Use Keep a Changelog categories: `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`.
 - **MUST** keep the family table inside `<!-- family-table:start ... end -->` markers as a single table. The `scripts/reconcile-family-table.ps1` script regenerates this block; never hand-edit if you can run the script instead.
-- **MUST** keep instruction wrappers in `.github/instructions/` thin (under 3 KB) — they load via `applyTo:` and reference the deep skill in `docs/skills/`.
+- **MUST** keep instruction wrappers in `.github/instructions/` thin (under 3 KB) for all new/edited wrappers — they load via `applyTo:` and reference the deep skill in `docs/skills/`. `.github/instructions/powershell.instructions.md` is a legacy exception; when editing it, do not increase its size.
 - **NEVER** add a skill in `docs/skills/` without also adding the matching wrapper in `.github/instructions/` and the row in the skills registry table below.
 - **NEVER** edit submodule content (`docs/skills/tauri2-skills/`, `docs/skills/threejs-skills/`) — update the submodule pointer instead.
 
@@ -56,15 +56,17 @@ These rules apply only when working *on* this repo. Consumer repos load this fil
 | `desktop-toolkit` | Shared framework for Tauri desktop apps | Tauri 2.0, React, Rust, Python |
 | `launcher` | Desktop launcher and updater — activation, app routing, updater | Tauri 2.0, React, Rust |
 | `transmittal-builder` | Python FastAPI backend service — engineering transmittal package generator | Python, FastAPI |
-| `Drawing-List-Manager` | Tauri app with Python sidecar — project drawing register | Tauri 2.0, Rust |
-| `batch-fnr` | Batch DXF Find-and-Replace with headless .NET AutoCAD sidecar | Tauri 2.0, Rust, React, .NET |
+| `Drawing-List-Manager` | Python FastAPI backend service — project drawing register | Python, FastAPI |
+| `batch-fnr` | Backend service for batch DXF find-and-replace workflows | .NET |
 | `block-library` | Tauri 2 desktop DXF viewer with Google Drive catalog sync and SQLite local cache | Tauri 2.0, React, Three.js, Rust |
 | `Foundry` | Local agent broker — Ollama-backed dep-reviewer and other agents | .NET, Ollama, Microsoft.SemanticKernel |
 | `autocad-knowledge` | AutoCAD .NET pattern reference — source of truth for AUTOCAD_DOTNET.md skill | Markdown, C# samples |
 | `chamber-19-autocad-mcp` | MCP server inside AutoCAD — read-only inspection surface for LLM agents | .NET, PowerShell |
 | `IFA-IFC-Checklist` | Macro-enabled Excel workbook for IFA/IFC pre-submittal checklists | Excel VBA |
 | `Glyphic` | TODO: curate role for Glyphic | TODO |
-| `.github` | TODO: curate role copy for this repo in family-table generation | Markdown, YAML |
+| `.github` | Org-wide configuration hub: shared instructions, skills, workflows, and maintenance scripts | Markdown, YAML |
+| `chamber-19-assets` | TODO: curate role for chamber-19-assets | TODO |
+| `vanguard` | TODO: curate role for vanguard | TODO |
 <!-- family-table:end -->
 
 Consumer apps (`transmittal-builder`, `Drawing-List-Manager`, `launcher`)
@@ -96,6 +98,43 @@ Chamber 19 desktop tools now follow a **shared shell + per-app backend** model:
 
 **When adding a new tool:** Create backend service, register route in launcher config, done.
 Launcher doesn't need rebuilding per tool.
+
+---
+
+## Standard AI agent intake for new apps
+
+When a new app idea is proposed and the app will include local AI agents, follow this exact intake flow every time.
+
+- **MUST** keep agent memory and learned data per-app only. Never share agent memory databases across apps.
+- **MUST** ask for agent purpose before scaffolding any agent files.
+- **MUST** scaffold only starter wiring in the launcher and keep business logic/schema evolution in the app backend.
+- **MUST** create empty starter data stores for each app so learned data is not pre-seeded.
+
+### Required intake questions (in order)
+
+1. What is the app identifier (`app_id`)?
+2. What is the primary agent purpose (one sentence)?
+3. What are the initial agent capabilities (3-7 bullets)?
+4. What data is in scope vs out of scope for this agent?
+5. Which mascot template should be used for v1?
+
+### Required scaffold outputs (minimum)
+
+1. `agent-manifest.json` with `app_id`, purpose, capabilities, and schema version.
+2. Empty per-app datastore placeholders (for example, `app_id.agents.db` and `app_id.memory.db`).
+3. App-local `AGENT_PURPOSE.md` capturing scope, constraints, and fail-open behavior.
+
+### Default mascot template set (v7)
+
+Use these as first-choice templates unless the user chooses otherwise:
+
+1. Scarlet Jackal
+2. Ash Golem
+3. Forge Bear
+4. Rose Moth
+5. Graphite Owl
+
+Reference source: `chamber-19-assets/Assets/mira-creature-shape-mascots-v7/`.
 
 ---
 
@@ -174,6 +213,43 @@ non-negotiable in every UI in the org.
 No purple gradients on white. No Inter, Roboto, or Arial. No exclamation
 points. Tone: warm, matter-of-fact, engineering-grade. Never
 marketing-driven.
+
+## Accessibility — mandatory for all React UIs
+
+**MUST:** Every `<input>`, `<select>`, and `<textarea>` element must have both an `id` and a `name` attribute. Use `id` for `<label htmlFor>` association. Add `aria-label` when no visible label exists.
+
+```tsx
+// CORRECT
+<input id="course-search" name="course-search" aria-label="Search courses" ... />
+<select id="filter-institution" name="filter-institution" aria-label="Filter by institution" ...>
+
+// WRONG — fails screen reader association and browser autofill hint
+<input value={...} onChange={...} placeholder="Search courses" />
+```
+
+**MUST NOT:** Use `<span onClick>` or `<div onClick>` as interactive controls. Use `<button>` for clickable actions — it is keyboard-focusable and announced correctly by screen readers.
+
+**MUST NOT:** Write `outline: none` without a companion `:focus-visible` rule that provides an equivalent visible ring.
+
+---
+
+## UI and CSS discipline — load before editing
+
+Any work that touches the user interface — components, layouts, theme, typography, color, spacing, animation, microcopy, or accessibility behavior — **MUST** be governed by two skills:
+
+- **[`docs/skills/CSS_DISCIPLINE.md`](../docs/skills/CSS_DISCIPLINE.md)** — load before editing any `.css`, `.scss`, `.sass`, `.less` file or any inline `style={{ ... }}` object. Covers the token contract (`--ch-*`), the `_theme.override.css` extension pattern, the `!important` ban, the naked-element-selector ban, and build-blocking stylelint enforcement.
+- **[`docs/skills/UI_UX_DISCIPLINE.md`](../docs/skills/UI_UX_DISCIPLINE.md)** — load before editing any UI-affecting file (React components, HTML, Tauri webview UI, splash/update/activation flows, user-facing copy). Covers toolkit primitive reuse, theme governance, the consent-gated custom theming flow, microcopy tone, and the WCAG AA accessibility contract.
+
+**MUST:** Load both skills **before the first edit** to a UI file. Loading after the edit is too late — the bad pattern is already in the diff. The wrappers at `.github/instructions/css-discipline.instructions.md` and `.github/instructions/ui-ux-discipline.instructions.md` auto-apply via `applyTo:` globs, but you are responsible for actually following the rules they reference.
+
+**MUST:** Push back on requests that violate these rules. Examples:
+
+- Asked to "just use `#fff`" → refuse, point to the token, offer to add it if missing.
+- Asked to duplicate a toolkit Sidebar / TopBar / theme module in a consumer app → refuse, propose the toolkit-extension path.
+- Asked to add `!important` to fix a cascade conflict → refuse, trace the conflict, fix the source rule.
+- Asked to ship a marketing-tone error message → refuse, rewrite to Chamber 19 voice.
+
+Do not comply-then-warn. The bad code is already in the diff at that point. Refuse and propose the correct alternative in the same turn.
 
 ---
 

@@ -49,6 +49,8 @@ Two kinds of skills live in this repo:
 | `AUTOCAD_ASSISTANT.md` | Autodesk Assistant queries, MCP client patterns |
 | `VBA_EXCEL.md` | VBA macros for IFA-IFC-Checklist |
 | `MARKDOWN.md` | Any `.md` file in the org |
+| `CSS_DISCIPLINE.md` | Any CSS/SCSS/Sass/Less or inline style object work |
+| `UI_UX_DISCIPLINE.md` | Any UI-facing change (components, copy, layouts, accessibility behavior) |
 | `DOCX.md` | Word document generation (transmittal-builder) |
 | `BIOME.md` | TypeScript/JavaScript linting and formatting in frontend repos |
 | `CHANGELOG.md` | Writing or updating any `CHANGELOG.md` — format, date convention, categories, release procedure |
