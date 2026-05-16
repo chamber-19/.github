@@ -1,0 +1,137 @@
+name: Reusable — CSS Discipline
+
+# Reusable workflow that runs @chamber-19/stylelint-config against a consumer
+# repo's CSS/SCSS/Sass/Less files. Emits GitHub Actions ::error annotations
+# inline on the PR's Files Changed tab so authors and AI agents see the
+# violation in context, with a path back to docs/skills/CSS_DISCIPLINE.md.
+#
+# Pair with chamber-19/.github → docs/skills/CSS_DISCIPLINE.md.
+#
+# Usage from a consumer repo:
+#
+#   # consumer-repo/.github/workflows/lint-css.yml
+#   name: Lint CSS
+#   on:
+#     pull_request:
+#       paths:
+#         - '**/*.css'
+#         - '**/*.scss'
+#         - '**/*.sass'
+#         - '**/*.less'
+#         - '.stylelintrc*'
+#         - 'package.json'
+#         - 'package-lock.json'
+#   jobs:
+#     css:
+#       uses: chamber-19/.github/.github/workflows/reusable-css-discipline.yml@main
+#       permissions:
+#         contents: read
+#         packages: read
+#
+# Consumer repo prerequisites:
+# - stylelint and @chamber-19/stylelint-config in devDependencies
+# - .stylelintrc.json (or stylelint key in package.json) extending the config
+# - .npmrc with @chamber-19:registry=https://npm.pkg.github.com (for GH Packages)
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: Node.js version to use
+        required: false
+        type: string
+        default: "20"
+      working-directory:
+        description: Directory containing package.json and the stylelint config
+        required: false
+        type: string
+        default: "."
+      css-glob:
+        description: Glob pattern for CSS/SCSS/Sass/Less files to lint
+        required: false
+        type: string
+        default: "**/*.{css,scss,sass,less}"
+      gh-packages-scope:
+        description: npm scope for GitHub Packages registry
+        required: false
+        type: string
+        default: "@chamber-19"
+      allow-empty-input:
+        description: Pass --allow-empty-input so repos with no CSS files still pass
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  css-discipline:
+    name: CSS Discipline
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js (with GitHub Packages auth)
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: npm
+          cache-dependency-path: ${{ inputs.working-directory }}/package-lock.json
+          registry-url: "https://npm.pkg.github.com"
+          scope: ${{ inputs.gh-packages-scope }}
+
+      - name: Install dependencies
+        working-directory: ${{ inputs.working-directory }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm ci
+
+      - name: Run stylelint with GitHub annotations
+        id: stylelint
+        working-directory: ${{ inputs.working-directory }}
+        env:
+          CSS_GLOB: ${{ inputs.css-glob }}
+          ALLOW_EMPTY_INPUT: ${{ inputs.allow-empty-input }}
+        run: |
+          set -euo pipefail
+
+          stylelint_args=(
+            "$CSS_GLOB"
+            "--max-warnings"
+            "0"
+            "--formatter"
+            "github"
+          )
+
+          if [ "$ALLOW_EMPTY_INPUT" = "true" ]; then
+            stylelint_args+=("--allow-empty-input")
+          fi
+
+          # --formatter github emits ::error file=...,line=...,col=...:: lines
+          # that GitHub Actions renders inline on the PR's Files Changed tab.
+          # --max-warnings 0 makes warnings fail the build too — no acceptable
+          # tier between "violation" and "fine."
+          npx stylelint "${stylelint_args[@]}"
+
+      - name: Failure footer
+        if: ${{ always() && steps.stylelint.outcome == 'failure' }}
+        run: |
+          {
+            echo "## CSS Discipline failed"
+            echo ""
+            echo "One or more rules from \`@chamber-19/stylelint-config\` were violated."
+            echo "Each error annotation on the Files Changed tab includes the rule name"
+            echo "and a reference to the canonical skill:"
+            echo ""
+            echo "\`chamber-19/.github → docs/skills/CSS_DISCIPLINE.md\`"
+            echo ""
+            echo "Common fixes:"
+            echo "- \`color-no-hex\` — replace hex with a \`--ch-*\` token, or extend via \`_theme.override.css\`"
+            echo "- \`declaration-no-important\` — find the source selector outranking the rule and scope that selector more narrowly"
+            echo "- \`selector-max-type\` — move naked element selectors into \`_reset.css\` and use classes in components"
+            echo "- \`selector-class-pattern\` — rename to kebab-case (BEM modifiers allowed)"
+            echo "- \`custom-property-pattern\` — use \`--ch-*\` / \`--component-name\` / \`--_internal\`"
+          } >> "$GITHUB_STEP_SUMMARY"
