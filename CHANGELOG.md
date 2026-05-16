@@ -12,6 +12,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 > **Format:** New entries use date-first grouping — `### YYYY-MM-DD` at top, then `#### Added` / `#### Changed` / etc. under it. Older entries below use the legacy category-first format and are not being retrofitted.
 
+### 2026-05-16
+
+#### Fixed
+
+- `.github/workflows/auto-pr-body-and-labels.yml` — preserved manual PR sections (`Why`, `Verification`, `Linked issue`) when auto-updating managed PR body content.
+- `.github/workflows/fix-biome.yml` and `.github/workflows/fix-tailwind-canonical-vars.yml` — checked out `chamber-19/.github` explicitly in reusable runs and invoked scripts from that checkout path.
+- `scripts/family-manifest.yml` — added `chamber-19-assets` and `vanguard` as `needs-curation` entries so family-table reconciliation passes with current org repo set.
+- `AGENTS.md`, `docs/pilots.md`, `.github/prompts/add-to-learning.prompt.md`, and `.github/instructions/learning.instructions.md` — removed broken machine-specific/workspace-specific references.
+- `docs/skills/CHANGELOG.md`, `docs/skills/BIOME.md`, and `docs/skills/acquire-codebase-knowledge/SKILL.md` plus acquire-codebase templates — corrected date-heading examples, stale path guidance, grammar, and Markdown table separator style.
+
 ### 2026-05-10
 
 #### Added

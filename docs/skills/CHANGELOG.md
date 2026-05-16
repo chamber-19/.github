@@ -120,7 +120,7 @@ Always wrap file paths, directory names, command names, and configuration keys i
 
 ```markdown
 # Good
-#### 2026-05-09
+### 2026-05-09
 
 - `docs/skills/MARKDOWN.md` — added `## Accessibility` section covering alt text and emoji rules.
 
@@ -134,7 +134,7 @@ Write entries as past-tense statements of fact, not as passive descriptions.
 
 ```markdown
 # Good
-#### 2026-05-09
+### 2026-05-09
 
 - `AGENTS.md` — added repo-root pointer for AI agents.
 
@@ -207,7 +207,7 @@ When cutting a release for a repo that uses this CHANGELOG:
 | Entry has no file path or feature name | Add the path or name in backticks — entries without anchors are not searchable |
 | Entry is passive voice | Rewrite as active: "renamed X to Y", "added Y to Z" |
 | Entry spans multiple sentences | Compress into one compound sentence or split into separate bullets |
-| Missing date grouping on `[Unreleased]` entry | Add or reuse `#### YYYY-MM-DD` and place the bullet under it |
+| Missing date grouping on `[Unreleased]` entry | Add or reuse `### YYYY-MM-DD` and place the bullet under it |
 | New category invented (e.g. `Updated`) | Rename to the correct KaC category |
 | Date repeated on each bullet for the same day | Keep one `#### YYYY-MM-DD` subheading and remove duplicated per-bullet dates |
 | Entry has BOTH a `#### YYYY-MM-DD` subheading AND a `[YYYY-MM-DD]` per-bullet tag | Remove the per-bullet tag — the subheading is the authoritative date; per-bullet dates are the old format and must never appear alongside a date subheading |

@@ -94,7 +94,7 @@ jobs:
 
             const truncated = files.length > 12 ? `\n- ...and ${files.length - 12} more file(s)` : "";
 
-            const generatedBody = [
+            const managedSummary = [
               "# Pull Request",
               "",
               "<!-- auto-pr:managed -->",
@@ -106,7 +106,9 @@ jobs:
               "",
               ...sample,
               truncated,
-              "",
+            ].join("\n");
+
+            const manualSectionsTemplate = [
               "## Why",
               "Optional: add one short line if context is not obvious.",
               "",
@@ -127,11 +129,20 @@ jobs:
               existingBody.trim() === "" || hasManagedMarker || looksLikeLegacyTemplate;
 
             if (shouldReplaceBody) {
+              let finalBody = `${managedSummary}\n\n${manualSectionsTemplate}`;
+              if (hasManagedMarker) {
+                const manualStart = existingBody.indexOf("\n## Why");
+                if (manualStart >= 0) {
+                  const manualSections = existingBody.slice(manualStart + 1).trim();
+                  finalBody = `${managedSummary}\n\n${manualSections}`;
+                }
+              }
+
               await github.rest.pulls.update({
                 owner,
                 repo,
                 pull_number,
-                body: generatedBody,
+                body: finalBody,
               });
               core.info("PR body updated.");
             } else {

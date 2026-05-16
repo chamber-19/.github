@@ -49,7 +49,7 @@ State the file path and what was added or updated. One sentence.
 
 ## Concept note format
 
-Read `learning/SKILL.md` for the full format reference. The structure is:
+Use the format below as the source of truth for this prompt in this repo. The structure is:
 
 ```markdown
 # Concept name
@@ -108,7 +108,7 @@ One-paragraph purpose statement.
 These defaults apply unless the user specifies otherwise:
 
 | Parameter | Default |
-|---|---|
+| --- | --- |
 | Target folder | `learning/concepts/` |
 | File format | Concept note format above |
 | On existing note | Add new section, do not rewrite |
