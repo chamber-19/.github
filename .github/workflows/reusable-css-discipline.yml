@@ -91,22 +91,29 @@ jobs:
 
       - name: Run stylelint with GitHub annotations
         working-directory: ${{ inputs.working-directory }}
+        env:
+          CSS_GLOB: ${{ inputs.css-glob }}
+          ALLOW_EMPTY_INPUT: ${{ inputs.allow-empty-input }}
         run: |
           set -euo pipefail
 
-          empty_flag=""
-          if [ "${{ inputs.allow-empty-input }}" = "true" ]; then
-            empty_flag="--allow-empty-input"
+          stylelint_args=(
+            "$CSS_GLOB"
+            "--max-warnings"
+            "0"
+            "--formatter"
+            "github"
+          )
+
+          if [ "$ALLOW_EMPTY_INPUT" = "true" ]; then
+            stylelint_args+=("--allow-empty-input")
           fi
 
           # --formatter github emits ::error file=...,line=...,col=...:: lines
           # that GitHub Actions renders inline on the PR's Files Changed tab.
           # --max-warnings 0 makes warnings fail the build too — no acceptable
           # tier between "violation" and "fine."
-          npx stylelint "${{ inputs.css-glob }}" \
-            --max-warnings 0 \
-            --formatter github \
-            $empty_flag
+          npx stylelint "${stylelint_args[@]}"
 
       - name: Failure footer
         if: ${{ failure() }}
