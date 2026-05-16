@@ -129,7 +129,7 @@ jobs:
             echo ""
             echo "Common fixes:"
             echo "- \`color-no-hex\` — replace hex with a \`--ch-*\` token, or extend via \`_theme.override.css\`"
-            echo "- \`declaration-no-important\` — find the source selector outranking the rule and scope that"
+            echo "- \`declaration-no-important\` — find the source selector outranking the rule and scope that selector more narrowly"
             echo "- \`selector-max-type\` — move naked element selectors into \`_reset.css\` and use classes in components"
             echo "- \`selector-class-pattern\` — rename to kebab-case (BEM modifiers allowed)"
             echo "- \`custom-property-pattern\` — use \`--ch-*\` / \`--component-name\` / \`--_internal\`"
