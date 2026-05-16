@@ -12,35 +12,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 > **Format:** New entries use date-first grouping — `### YYYY-MM-DD` at top, then `#### Added` / `#### Changed` / etc. under it. Older entries below use the legacy category-first format and are not being retrofitted.
 
-### 2026-05-16
-
-#### Changed
-
-- `scripts/family-manifest.yml` and reconciled family-table outputs (`profile/README.md`, `.github/copilot-instructions.md`) — aligned backend-service role/stack wording for `transmittal-builder`, `Drawing-List-Manager`, and `batch-fnr`; replaced `.github` TODO row with concrete org-hub copy; added `chamber-19-assets` and `vanguard` as `needs-curation` entries so reconcile validation passes.
-- `.github/workflows/auto-pr-body-and-labels.yml` — constrained managed-body updates to an auto-generated summary block, preserving author-edited `Why`, `Verification`, and `Linked issue` sections on subsequent runs.
-- `.github/workflows/fix-biome.yml` and `.github/workflows/fix-tailwind-canonical-vars.yml` — added explicit checkout of `chamber-19/.github` into a dedicated path so reusable `workflow_call` runs can access maintenance scripts reliably.
-- `.github/copilot-instructions.md` and `AGENTS.md` — updated wrapper-size rule to apply to new/modified wrappers while requiring legacy oversized wrappers to be slimmed when touched.
-- `docs/skills/CSS_DISCIPLINE.md`, `docs/skills/UI_UX_DISCIPLINE.md`, and `docs/skills/BIOME.md` — corrected token/rule wording and stale-path references; clarified that shared enforcement packages/hooks are planned rollout work, not already shipped.
-- `README.md`, `.github/prompts/add-to-learning.prompt.md`, `.github/instructions/learning.instructions.md`, `docs/pilots.md`, and `AGENTS.md` — removed broken machine/workspace-specific references and replaced them with repo-relative guidance.
-- `docs/skills/CHANGELOG.md`, `docs/skills/acquire-codebase-knowledge/SKILL.md`, and acquire-codebase template files — fixed heading-level examples, grammar, and Markdown table-separator style to match Chamber 19 Markdown rules.
-- `docs/codebase/*.md` and `docs/codebase/.codebase-scan.txt` — replaced unfilled placeholders with evidence-backed content and regenerated scan output from the current repository state.
-
-### 2026-05-14
-
-#### Added
-
-- `docs/skills/CSS_DISCIPLINE.md` — new skill governing CSS/SCSS/Sass/Less and inline `style` objects across all Chamber 19 repos. Covers the `--ch-*` token contract, the `_theme.override.css` extension pattern, the `!important` ban, the naked-element-selector ban, right/wrong examples, build-blocking enforcement via `@chamber-19/stylelint-config`, and the AI push-back contract. Aggressively keyword-loaded first paragraph for reliable auto-trigger.
-- `docs/skills/UI_UX_DISCIPLINE.md` — new skill governing any change that affects what a human sees, hears, or interacts with in a Chamber 19 product. Covers toolkit primitive reuse contract (no duplicating Sidebar/TopBar/ActivationGate/etc. in consumer apps), theme governance with the consent-gated custom theming flow, microcopy rules (warm, matter-of-fact, engineering-grade — no exclamations), WCAG AA accessibility contract, and the AI push-back contract.
-- `.github/instructions/css-discipline.instructions.md` — thin wrapper auto-applying CSS Discipline rules to `**/*.{css,scss,sass,less}` via `applyTo:` frontmatter.
-- `.github/instructions/ui-ux-discipline.instructions.md` — thin wrapper auto-applying UI/UX Discipline rules to `**/*.{tsx,jsx,ts,js,html,vue,css,scss,sass,less}`.
-- `.github/copilot-instructions.md` — new "UI and CSS discipline — load before editing" section with explicit MUST directives, push-back examples (no `#fff`, no toolkit primitive duplication, no `!important` band-aid, no marketing tone), and a no-comply-then-warn rule.
-- `.github/copilot-instructions.md` skills registry — two new rows for `CSS_DISCIPLINE.md` and `UI_UX_DISCIPLINE.md`.
-
-#### Changed
-
-- `.github/copilot-instructions.md` — added a standard Chamber 19 new-app AI agent intake flow: mandatory purpose questions, per-app memory isolation rule, required starter scaffold outputs, and default v7 mascot template shortlist (Scarlet Jackal, Ash Golem, Forge Bear, Rose Moth, Graphite Owl).
-- `docs/skills/AI_READY.md` — added Chamber 19 extension section for repeatable new-app AI agent intake and starter scaffold contract (manifest + empty per-app datastore placeholders + `AGENT_PURPOSE.md`), with explicit per-app memory-only requirement.
-
 ### 2026-05-10
 
 #### Added
@@ -66,9 +37,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 #### Fixed
 
 - `scripts/lint-org-config.ps1` — renamed `$matches` → `$skillMatches` to avoid assigning to the `$Matches` automatic variable, eliminating a PSScriptAnalyzer warning.
-- `.github/workflows/fix-biome.yml` and `.github/workflows/fix-tailwind-canonical-vars.yml` — replaced single-quoted multiline shell body construction with heredoc literals to satisfy `actionlint`/shellcheck `SC2016`.
-- `.github/workflows/lint-yaml.yml` — replaced unquoted command substitution with a `find -print0` + `mapfile` array pattern, fixing shellcheck `SC2046` and preserving file paths safely.
-- `scripts/reconcile-family-table.ps1` — Python YAML fallback now uses `json.dumps(..., default=str)` so YAML `date` values serialize correctly; added manifest-shape validation to avoid cascading `repos` property errors.
 
 ### Added
 

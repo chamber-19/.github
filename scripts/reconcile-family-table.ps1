@@ -45,7 +45,7 @@ function Get-PythonCommand {
     # Conda/Miniconda — $env:CONDA_PREFIX is set when a conda env is active
     if ($env:CONDA_PREFIX) {
         $condaPython = Join-Path $env:CONDA_PREFIX "python.exe"
-        if ((Test-Path $condaPython) -and (Test-PyYaml -Command $condaPython)) {
+        if (Test-Path $condaPython) {
             return $condaPython
         }
     }
@@ -61,7 +61,7 @@ function Get-PythonCommand {
     )
 
     foreach ($candidate in $candidatePaths) {
-        if ((Test-Path $candidate) -and (Test-PyYaml -Command $candidate)) {
+        if (Test-Path $candidate) {
             return $candidate
         }
     }

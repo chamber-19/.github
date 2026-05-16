@@ -94,8 +94,11 @@ jobs:
 
             const truncated = files.length > 12 ? `\n- ...and ${files.length - 12} more file(s)` : "";
 
-            const autoSummaryBlock = [
-              "<!-- auto-pr:summary:start -->",
+            const generatedBody = [
+              "# Pull Request",
+              "",
+              "<!-- auto-pr:managed -->",
+              "",
               "## What changed",
               `Scope: ${scope}`,
               `Files changed: ${files.length}`,
@@ -103,16 +106,6 @@ jobs:
               "",
               ...sample,
               truncated,
-              "",
-              "<!-- auto-pr:summary:end -->",
-            ].join("\n");
-
-            const generatedBody = [
-              "# Pull Request",
-              "",
-              "<!-- auto-pr:managed -->",
-              "",
-              autoSummaryBlock,
               "",
               "## Why",
               "Optional: add one short line if context is not obvious.",
@@ -133,61 +126,12 @@ jobs:
             const shouldReplaceBody =
               existingBody.trim() === "" || hasManagedMarker || looksLikeLegacyTemplate;
 
-            const extractSection = (body, heading, fallback) => {
-              const escapedHeading = heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-              const regex = new RegExp(`${escapedHeading}\\s*\\n([\\s\\S]*?)(?=\\n##\\s|$)`, "m");
-              const match = body.match(regex);
-              if (!match) return fallback;
-              const value = match[1].trim();
-              return value === "" ? fallback : value;
-            };
-
             if (shouldReplaceBody) {
-              let nextBody = generatedBody;
-
-              if (hasManagedMarker && existingBody.includes("<!-- auto-pr:summary:start -->")) {
-                nextBody = existingBody.replace(
-                  /<!-- auto-pr:summary:start -->[\s\S]*?<!-- auto-pr:summary:end -->/m,
-                  autoSummaryBlock,
-                );
-              } else if (hasManagedMarker && !looksLikeLegacyTemplate && existingBody.trim() !== "") {
-                const whyText = extractSection(
-                  existingBody,
-                  "## Why",
-                  "Optional: add one short line if context is not obvious.",
-                );
-                const verificationText = extractSection(
-                  existingBody,
-                  "## Verification",
-                  "Optional: add command(s) you ran, or write Not run.",
-                );
-                const linkedIssueText = extractSection(existingBody, "## Linked issue", "Closes #");
-
-                nextBody = [
-                  "# Pull Request",
-                  "",
-                  "<!-- auto-pr:managed -->",
-                  "",
-                  autoSummaryBlock,
-                  "",
-                  "## Why",
-                  whyText,
-                  "",
-                  "## Verification",
-                  verificationText,
-                  "",
-                  "## Linked issue",
-                  linkedIssueText,
-                  "",
-                  "Tip: add <!-- auto-pr:off --> to stop future auto-updates to this PR body.",
-                ].join("\n");
-              }
-
               await github.rest.pulls.update({
                 owner,
                 repo,
                 pull_number,
-                body: nextBody,
+                body: generatedBody,
               });
               core.info("PR body updated.");
             } else {

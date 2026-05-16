@@ -7,7 +7,7 @@
 List only meaningful top-level directories and files.
 
 | Path | Purpose | Evidence |
-| --- | --- | --- |
+|------|---------|----------|
 | [path/] | [purpose] | [source] |
 
 ### 2) Entry Points
@@ -19,7 +19,7 @@ List only meaningful top-level directories and files.
 ### 3) Module Boundaries
 
 | Boundary | What belongs here | What must not be here |
-| --- | --- | --- |
+|----------|-------------------|------------------------|
 | [module/layer] | [responsibility] | [forbidden logic] |
 
 ### 4) Naming and Organization Rules

@@ -95,22 +95,6 @@ repos:
     status: needs-curation
     architecture_status: reference-only
     last_verified: 2026-05-10
-  - name: chamber-19-assets
-    profile_role: "TODO: curate role for chamber-19-assets"
-    copilot_role: "TODO: curate role for chamber-19-assets"
-    stack: "TODO"
-    category: needs-curation
-    status: needs-curation
-    architecture_status: reference-only
-    last_verified: 2026-05-16
-  - name: vanguard
-    profile_role: "TODO: curate role for vanguard"
-    copilot_role: "TODO: curate role for vanguard"
-    stack: "TODO"
-    category: needs-curation
-    status: needs-curation
-    architecture_status: reference-only
-    last_verified: 2026-05-16
 
 table_targets:
   profile:

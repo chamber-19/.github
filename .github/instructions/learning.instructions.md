@@ -4,7 +4,7 @@ applyTo: "learning/**"
 
 # Learning folder — concept notes
 
-This folder is a personal reference library. Each file in `concepts/` covers one concept. Follow the concept-note contract in `.github/prompts/add-to-learning.prompt.md` before writing or editing any file here.
+This folder is a personal reference library. Each file in `concepts/` covers one concept. Read `learning/SKILL.md` before writing or editing any file here.
 
 ## Non-negotiable
 

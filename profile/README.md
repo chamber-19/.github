@@ -30,15 +30,13 @@ automation live in the
 | [`transmittal-builder`](https://github.com/chamber-19/transmittal-builder) | Backend service for engineering transmittal generation (invoked by launcher) |
 | [`Drawing-List-Manager`](https://github.com/chamber-19/Drawing-List-Manager) | Backend service for project drawing registers (invoked by launcher) |
 | [`batch-fnr`](https://github.com/chamber-19/batch-fnr) | Backend service for batch DXF find-and-replace workflows |
-| [`block-library`](https://github.com/chamber-19/block-library) | Tauri 2 desktop DXF viewer with Google Drive catalog sync and SQLite local cache |
+| [`block-library`](https://github.com/chamber-19/block-library) | UI-first exception: desktop DXF viewer with Google Drive catalog sync and SQLite local cache |
 | [`Foundry`](https://github.com/chamber-19/Foundry) | Local agent broker — routes GitHub and Discord jobs to local LLMs via Ollama |
 | [`autocad-knowledge`](https://github.com/chamber-19/autocad-knowledge) | Reference patterns and knowledge base for AutoCAD .NET plugins |
 | [`chamber-19-autocad-mcp`](https://github.com/chamber-19/chamber-19-autocad-mcp) | AutoCAD .NET plugin exposing an MCP server inside acad.exe — read-only inspection tools for LLM agents |
 | [`IFA-IFC-Checklist`](https://github.com/chamber-19/IFA-IFC-Checklist) | Macro-enabled Excel workbook for IFA and IFC pre-submittal checklists |
 | [`Glyphic`](https://github.com/chamber-19/Glyphic) | TODO: curate role for Glyphic |
 | [`.github`](https://github.com/chamber-19/.github) | Org-wide configuration hub: shared instructions, skills, workflows, and maintenance scripts |
-| [`chamber-19-assets`](https://github.com/chamber-19/chamber-19-assets) | TODO: curate role for chamber-19-assets |
-| [`vanguard`](https://github.com/chamber-19/vanguard) | TODO: curate role for vanguard |
 <!-- family-table:end -->
 
 ## Architecture (2026)

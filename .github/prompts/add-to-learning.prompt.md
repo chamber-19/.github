@@ -49,7 +49,7 @@ State the file path and what was added or updated. One sentence.
 
 ## Concept note format
 
-Use the structure below as the format reference for concept notes:
+Read `learning/SKILL.md` for the full format reference. The structure is:
 
 ```markdown
 # Concept name

@@ -40,7 +40,7 @@ When the change is **inside this repo** (not a consumer repo), additional rules 
 
 - **MUST** add an entry to [`CHANGELOG.md`](../CHANGELOG.md) under `## [Unreleased]` for every PR. Use Keep a Changelog categories: `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`.
 - **MUST** keep the family table inside `<!-- family-table:start ... end -->` markers as a single table. The `scripts/reconcile-family-table.ps1` script regenerates this block; never hand-edit if you can run the script instead.
-- **MUST** keep new or modified instruction wrappers in `.github/instructions/` thin (under 3 KB) — they load via `applyTo:` and reference the deep skill in `docs/skills/`. Legacy oversized wrappers must be slimmed when touched.
+- **MUST** keep instruction wrappers in `.github/instructions/` thin (under 3 KB) — they load via `applyTo:` and reference the deep skill in `docs/skills/`.
 - **NEVER** add a skill in `docs/skills/` without also adding the matching wrapper in `.github/instructions/` and the row in the skills registry table below.
 - **NEVER** edit submodule content (`docs/skills/tauri2-skills/`, `docs/skills/threejs-skills/`) — update the submodule pointer instead.
 
@@ -56,17 +56,15 @@ These rules apply only when working *on* this repo. Consumer repos load this fil
 | `desktop-toolkit` | Shared framework for Tauri desktop apps | Tauri 2.0, React, Rust, Python |
 | `launcher` | Desktop launcher and updater — activation, app routing, updater | Tauri 2.0, React, Rust |
 | `transmittal-builder` | Python FastAPI backend service — engineering transmittal package generator | Python, FastAPI |
-| `Drawing-List-Manager` | Python FastAPI backend service — project drawing register | Python, FastAPI |
-| `batch-fnr` | Backend service for batch DXF find-and-replace workflows | .NET |
+| `Drawing-List-Manager` | Tauri app with Python sidecar — project drawing register | Tauri 2.0, Rust |
+| `batch-fnr` | Batch DXF Find-and-Replace with headless .NET AutoCAD sidecar | Tauri 2.0, Rust, React, .NET |
 | `block-library` | Tauri 2 desktop DXF viewer with Google Drive catalog sync and SQLite local cache | Tauri 2.0, React, Three.js, Rust |
 | `Foundry` | Local agent broker — Ollama-backed dep-reviewer and other agents | .NET, Ollama, Microsoft.SemanticKernel |
 | `autocad-knowledge` | AutoCAD .NET pattern reference — source of truth for AUTOCAD_DOTNET.md skill | Markdown, C# samples |
 | `chamber-19-autocad-mcp` | MCP server inside AutoCAD — read-only inspection surface for LLM agents | .NET, PowerShell |
 | `IFA-IFC-Checklist` | Macro-enabled Excel workbook for IFA/IFC pre-submittal checklists | Excel VBA |
 | `Glyphic` | TODO: curate role for Glyphic | TODO |
-| `.github` | Org-wide configuration hub: shared instructions, skills, workflows, and maintenance scripts | Markdown, YAML |
-| `chamber-19-assets` | TODO: curate role for chamber-19-assets | TODO |
-| `vanguard` | TODO: curate role for vanguard | TODO |
+| `.github` | TODO: curate role copy for this repo in family-table generation | Markdown, YAML |
 <!-- family-table:end -->
 
 Consumer apps (`transmittal-builder`, `Drawing-List-Manager`, `launcher`)
@@ -275,8 +273,6 @@ relevant skill file before making changes in a given language or domain.
 | `acquire-codebase-knowledge/SKILL.md` | Mapping or documenting an existing codebase — outputs seven `docs/codebase/` documents |
 | `AI_READY.md` | Making a repo AI-ready — verifying or creating `AGENTS.md`, `copilot-instructions.md`, CI workflows, issue templates |
 | `POWERSHELL.md` | Writing or reviewing PowerShell scripts — approved verbs, parameter design, error handling, GitHub API patterns, `PowerShellForGitHub` |
-| `CSS_DISCIPLINE.md` | Writing or editing any CSS/SCSS/Sass/Less file or inline `style` object — token contract, override extension pattern, `!important` ban, class-only selectors, build-blocking enforcement |
-| `UI_UX_DISCIPLINE.md` | Any change that affects what a human sees, hears, or interacts with — components, layouts, theme, typography, accessibility, microcopy, splash/update/activation flows — load **before** the first edit |
 
 ---
 

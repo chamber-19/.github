@@ -27,7 +27,7 @@ It does **not** hold consumer-app code. App code lives in dedicated repos (`laun
 
 - **MUST** add a `CHANGELOG.md` entry for every PR — under the `## [Unreleased]` heading, in the appropriate category (`Added` / `Changed` / `Deprecated` / `Removed` / `Fixed` / `Security`). Use Keep a Changelog format.
 - **MUST** keep the family table inside `<!-- family-table:start -->` ... `<!-- family-table:end -->` markers as a single table. The reconcile script regenerates this block; never hand-edit if you can run the script instead.
-- **MUST** keep new or modified instruction wrappers in `.github/instructions/` thin (under 3 KB) — they load via `applyTo:` and reference the deep skill in `docs/skills/`. Legacy oversized wrappers must be slimmed when touched.
+- **MUST** keep instruction wrappers in `.github/instructions/` thin (under 3 KB) — they load via `applyTo:` and reference the deep skill in `docs/skills/`.
 - **NEVER** edit submodule content (`docs/skills/tauri2-skills/`, `docs/skills/threejs-skills/`) — those are external. Update the submodule pointer instead.
 - **NEVER** add a skill in `docs/skills/` without also adding the matching wrapper in `.github/instructions/` and the row in the skills registry table in `.github/copilot-instructions.md`.
 
@@ -38,10 +38,10 @@ This repo's housekeeping uses two foundational skills:
 - `docs/skills/acquire-codebase-knowledge/SKILL.md` — scan-then-document discipline for any repo audit. Drives the `docs/codebase/` template set.
 - `docs/skills/AI_READY.md` — pointer to John Papa's `ai-ready` skill for verifying any repo has the AI-discoverable artifact set (`AGENTS.md`, `copilot-instructions.md`, CI, issue templates, CHANGELOG).
 
-Additional skills are promoted into `docs/skills/` over time through normal PR review in this repo.
+Additional skills are promoted into `docs/skills/` over time per the workspace-level `IMPLEMENTATION_PLAN.md`.
 
 ## When in doubt
 
 1. Check `docs/memory.md` — institutional memory of incidents and closed decisions.
-2. Check `CHANGELOG.md` for the current execution history and pending work context.
+2. Check the workspace-level `IMPLEMENTATION_PLAN.md` — current execution master.
 3. Ask the user — direct, specific questions, not open-ended ones.

@@ -51,8 +51,6 @@ Two kinds of skills live in this repo:
 | `MARKDOWN.md` | Any `.md` file in the org |
 | `DOCX.md` | Word document generation (transmittal-builder) |
 | `BIOME.md` | TypeScript/JavaScript linting and formatting in frontend repos |
-| `CSS_DISCIPLINE.md` | CSS/SCSS/Sass/Less and inline-style discipline across Chamber 19 UIs |
-| `UI_UX_DISCIPLINE.md` | UI/UX discipline for component reuse, accessibility, and tone |
 | `CHANGELOG.md` | Writing or updating any `CHANGELOG.md` — format, date convention, categories, release procedure |
 | `POWERSHELL.md` | Writing or reviewing PowerShell scripts — approved verbs, parameter design, error handling, `PowerShellForGitHub` |
 

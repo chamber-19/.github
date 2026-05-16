@@ -9,28 +9,6 @@ This skill helps the user install the latest [ai-ready](https://github.com/johnp
 
 *Why?*: The full ai-ready skill is ~600 lines of detailed instructions that evolve frequently. This wrapper keeps it discoverable here while the source of truth stays in [johnpapa/ai-ready](https://github.com/johnpapa/ai-ready) — always up to date.
 
-## Chamber 19 extension: new app AI-agent intake
-
-When the user proposes a new app idea that will use local AI agents, run this intake before generating scaffolding.
-
-1. Ask for `app_id`.
-2. Ask for a single-sentence primary agent purpose.
-3. Ask for initial capabilities (3-7 bullets).
-4. Ask for data boundaries (in-scope and out-of-scope data).
-5. Ask for starter mascot template selection.
-
-Then generate the same starter wiring every time:
-
-1. `agent-manifest.json` with `app_id`, purpose, capabilities, schema version.
-2. Empty per-app datastore placeholders only (no seeded memory rows).
-3. `AGENT_PURPOSE.md` with scope, constraints, and fail-open behavior.
-
-Hard rule:
-
-- Agent memory is per-app only. Never share learned memory databases across apps.
-
-Starter mascot template shortlist (v7): Scarlet Jackal, Ash Golem, Forge Bear, Rose Moth, Graphite Owl.
-
 ## Steps
 
 1. Tell the user to download the latest `SKILL.md` to their personal skills directory by running one of these commands in their terminal. This will overwrite any existing local copy.

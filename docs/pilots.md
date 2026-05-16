@@ -50,7 +50,7 @@ Do NOT build. Reconsider only if you notice yourself typing the same multi-parag
 
 **Scope:** Build a 1:1:1 parity system across `docs/skills/` (deep reference) + `.github/instructions/` (auto-injected wrappers) + `.claude/commands/` (slash commands). Each skill gets all three.
 
-**Outcome:** All 13 skills have matching commands in the workspace `.claude/commands/` directory. Commands load the skill into context and apply it. Parity rule is enforced in both directions and documented in `CLAUDE.md` and `copilot-instructions.md`.
+**Outcome:** All 13 skills have matching commands at `C:\Users\koraj\Documents\GitHub\.claude\commands\`. Commands load the skill into context and apply it. Parity rule is enforced in both directions and documented in `CLAUDE.md` and `copilot-instructions.md`.
 
 **Decision:** The three-layer parity system is permanent. CLAUDE.md enforces: new skill → new wrapper → new command; enforce in both directions. The skills registry table in `copilot-instructions.md` is the authoritative list.
 
