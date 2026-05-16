@@ -40,7 +40,7 @@ When the change is **inside this repo** (not a consumer repo), additional rules 
 
 - **MUST** add an entry to [`CHANGELOG.md`](../CHANGELOG.md) under `## [Unreleased]` for every PR. Use Keep a Changelog categories: `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`.
 - **MUST** keep the family table inside `<!-- family-table:start ... end -->` markers as a single table. The `scripts/reconcile-family-table.ps1` script regenerates this block; never hand-edit if you can run the script instead.
-- **MUST** keep instruction wrappers in `.github/instructions/` thin (under 3 KB) for all new/edited wrappers — they load via `applyTo:` and reference the deep skill in `docs/skills/`. Legacy oversized wrappers must be explicitly called out before modification.
+- **MUST** keep instruction wrappers in `.github/instructions/` thin (under 3 KB) for all new/edited wrappers — they load via `applyTo:` and reference the deep skill in `docs/skills/`. `.github/instructions/powershell.instructions.md` is a legacy exception; when editing it, do not increase its size.
 - **NEVER** add a skill in `docs/skills/` without also adding the matching wrapper in `.github/instructions/` and the row in the skills registry table below.
 - **NEVER** edit submodule content (`docs/skills/tauri2-skills/`, `docs/skills/threejs-skills/`) — update the submodule pointer instead.
 

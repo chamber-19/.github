@@ -209,6 +209,6 @@ When cutting a release for a repo that uses this CHANGELOG:
 | Entry spans multiple sentences | Compress into one compound sentence or split into separate bullets |
 | Missing date grouping on `[Unreleased]` entry | Add or reuse `### YYYY-MM-DD` and place the bullet under it |
 | New category invented (e.g. `Updated`) | Rename to the correct KaC category |
-| Date repeated on each bullet for the same day | Keep one `#### YYYY-MM-DD` subheading and remove duplicated per-bullet dates |
-| Entry has BOTH a `#### YYYY-MM-DD` subheading AND a `[YYYY-MM-DD]` per-bullet tag | Remove the per-bullet tag — the subheading is the authoritative date; per-bullet dates are the old format and must never appear alongside a date subheading |
+| Date repeated on each bullet for the same day | Keep one `### YYYY-MM-DD` subheading and remove duplicated per-bullet dates |
+| Entry has BOTH a `### YYYY-MM-DD` subheading AND a `[YYYY-MM-DD]` per-bullet tag | Remove the per-bullet tag — the subheading is the authoritative date; per-bullet dates are the old format and must never appear alongside a date subheading |
 | Versioned section has per-entry dates | Strip per-bullet dates — the header date is sufficient |
