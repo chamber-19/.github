@@ -18,18 +18,33 @@ function Assert-PowerShellVersion {
 }
 
 function Get-PythonCommand {
-    if (Get-Command -Name python3 -ErrorAction SilentlyContinue) {
+    function Test-PyYaml {
+        param(
+            [Parameter(Mandatory = $true)]
+            [string]$Command
+        )
+
+        try {
+            & $Command -c "import yaml" | Out-Null
+            return $true
+        }
+        catch {
+            return $false
+        }
+    }
+
+    if ((Get-Command -Name python3 -ErrorAction SilentlyContinue) -and (Test-PyYaml -Command "python3")) {
         return "python3"
     }
 
-    if (Get-Command -Name python -ErrorAction SilentlyContinue) {
+    if ((Get-Command -Name python -ErrorAction SilentlyContinue) -and (Test-PyYaml -Command "python")) {
         return "python"
     }
 
     # Conda/Miniconda — $env:CONDA_PREFIX is set when a conda env is active
     if ($env:CONDA_PREFIX) {
         $condaPython = Join-Path $env:CONDA_PREFIX "python.exe"
-        if (Test-Path $condaPython) {
+        if ((Test-Path $condaPython) -and (Test-PyYaml -Command $condaPython)) {
             return $condaPython
         }
     }
@@ -45,7 +60,7 @@ function Get-PythonCommand {
     )
 
     foreach ($candidate in $candidatePaths) {
-        if (Test-Path $candidate) {
+        if ((Test-Path $candidate) -and (Test-PyYaml -Command $candidate)) {
             return $candidate
         }
     }

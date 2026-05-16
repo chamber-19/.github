@@ -1,6 +1,6 @@
 # CSS Discipline Skill
 
-Read this skill **before any edit to a CSS, SCSS, Sass, Less file, or any inline style block in a JSX, TSX, Vue, or HTML file** in any Chamber 19 repo. This skill governs how styles are written: token contract, cascade discipline, selector hygiene, and the override extension pattern. Violations are build-blocking under `@chamber-19/stylelint-config`.
+Read this skill **before any edit to a CSS, SCSS, Sass, Less file, or any inline style block in a JSX, TSX, Vue, or HTML file** in any Chamber 19 repo. This skill governs how styles are written: token contract, cascade discipline, selector hygiene, and the override extension pattern. Build-blocking enforcement is planned through shared stylelint packages.
 
 Trigger keywords for AI loading: CSS, SCSS, Sass, Less, styling, style, theme, palette, hex color, color token, design token, sidebar, topbar, top bar, navbar, button, modal, form, layout, component design, font, typography, font-family, font-size, line-height, spacing, margin, padding, border, border-radius, box-shadow, z-index, cascade, specificity, `!important`, override, dark mode, light mode, accessibility contrast, accent color, surface color, background, foreground, design system, visual design, UI polish, animation, transition, keyframe, focus ring, hover state, active state.
 
@@ -44,11 +44,11 @@ CSS damage accumulates silently. Three patterns we have already had to clean up 
 - **MUST** add a `:focus-visible` rule whenever you remove or override the browser default outline. `outline: none` without `:focus-visible` is an accessibility violation.
 - **MUST** include a justification comment when overriding a toolkit-supplied component style. Format: `/* override toolkit: reason — link */`.
 - **NEVER** write `!important`. If the cascade is fighting the rule, the fix is to find the source rule that's outranking it. The only legitimate use is overriding a third-party stylesheet inside a heavily-scoped class, and even then the override file is the place — not the component file.
-- **NEVER** write hex colors, `rgb()`, or `hsl()` values outside the tokens file or `_theme.override.css`. This is enforced by the `color-no-hex` stylelint rule.
+- **NEVER** write hex colors, `rgb()`, or `hsl()` values outside the tokens file or `_theme.override.css`. `color-no-hex` only blocks hex; functional colors must be blocked by a companion Chamber 19 custom rule.
 - **NEVER** write naked element selectors in component CSS (`h1`, `h2`, `p`, `a`, `button`, `input`, `select`, `textarea`). These go in the reset file only. Enforced by `selector-max-type: 0`.
 - **NEVER** duplicate token definitions across consumer apps. If a consumer app defines its own `--bg`, `--accent`, or `--text-1` matching the toolkit's contract, that's drift waiting to happen. Reference the toolkit's tokens instead.
 - **NEVER** style state with raw colors (`background: green` for success). Reference the semantic token (`var(--ch-success)`).
-- **NEVER** use arbitrary z-index numbers. All z-index values come from `--z-*` tokens (`--z-base`, `--z-raised`, `--z-sticky`, `--z-modal`, `--z-toast`, `--z-overlay`).
+- **NEVER** use arbitrary z-index numbers. All z-index values come from `--ch-z-*` tokens (`--ch-z-base`, `--ch-z-raised`, `--ch-z-sticky`, `--ch-z-modal`, `--ch-z-toast`, `--ch-z-overlay`).
 
 ---
 
@@ -189,7 +189,7 @@ p, small, span {
 
 ## Build-blocking enforcement
 
-These rules are enforced by `@chamber-19/stylelint-config` (toolkit-published) and `@chamber-19/stylelint-plugin-chamber19` (custom rule wrappers). Every consumer repo's CI runs:
+These rules define the target state. Build-blocking enforcement is planned via `@chamber-19/stylelint-config` (toolkit-published) and `@chamber-19/stylelint-plugin-chamber19` (custom rule wrappers). Once released, consumer repo CI will run:
 
 ```bash
 stylelint "**/*.{css,scss,sass,less}" --max-warnings 0
@@ -204,9 +204,7 @@ src/components/Foo.css:42:5
   Reference: chamber-19/.github → docs/skills/CSS_DISCIPLINE.md
 ```
 
-CI emits the same message as a `::error` annotation on the PR's Files Changed tab.
-
-A pre-commit hook (husky / lefthook, per repo) runs the same check locally so violations are caught before push.
+CI and pre-commit hooks should emit the same message as a `::error` annotation once the shared package rollout is complete.
 
 ---
 

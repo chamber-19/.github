@@ -30,6 +30,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: chamber-19/.github
+          path: org-config
 
       - name: Validate app secrets
         run: |
@@ -68,7 +72,7 @@ jobs:
           DEFAULT_BRANCH="$(gh repo view "$TARGET_REPO" --json defaultBranchRef -q '.defaultBranchRef.name')"
           git checkout -B "$BRANCH_NAME" "origin/$DEFAULT_BRANCH"
 
-          bash "$GITHUB_WORKSPACE/scripts/fix-biome.sh"
+          bash "$GITHUB_WORKSPACE/org-config/scripts/fix-biome.sh"
 
           if git diff --quiet; then
             echo "No changes for ${TARGET_REPO}"

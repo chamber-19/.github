@@ -12,6 +12,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 > **Format:** New entries use date-first grouping — `### YYYY-MM-DD` at top, then `#### Added` / `#### Changed` / etc. under it. Older entries below use the legacy category-first format and are not being retrofitted.
 
+### 2026-05-16
+
+#### Changed
+
+- `scripts/family-manifest.yml` and reconciled family-table outputs (`profile/README.md`, `.github/copilot-instructions.md`) — aligned backend-service role/stack wording for `transmittal-builder`, `Drawing-List-Manager`, and `batch-fnr`; replaced `.github` TODO row with concrete org-hub copy; added `chamber-19-assets` and `vanguard` as `needs-curation` entries so reconcile validation passes.
+- `.github/workflows/auto-pr-body-and-labels.yml` — constrained managed-body updates to an auto-generated summary block, preserving author-edited `Why`, `Verification`, and `Linked issue` sections on subsequent runs.
+- `.github/workflows/fix-biome.yml` and `.github/workflows/fix-tailwind-canonical-vars.yml` — added explicit checkout of `chamber-19/.github` into a dedicated path so reusable `workflow_call` runs can access maintenance scripts reliably.
+- `.github/copilot-instructions.md` and `AGENTS.md` — updated wrapper-size rule to apply to new/modified wrappers while requiring legacy oversized wrappers to be slimmed when touched.
+- `docs/skills/CSS_DISCIPLINE.md`, `docs/skills/UI_UX_DISCIPLINE.md`, and `docs/skills/BIOME.md` — corrected token/rule wording and stale-path references; clarified that shared enforcement packages/hooks are planned rollout work, not already shipped.
+- `README.md`, `.github/prompts/add-to-learning.prompt.md`, `.github/instructions/learning.instructions.md`, `docs/pilots.md`, and `AGENTS.md` — removed broken machine/workspace-specific references and replaced them with repo-relative guidance.
+- `docs/skills/CHANGELOG.md`, `docs/skills/acquire-codebase-knowledge/SKILL.md`, and acquire-codebase template files — fixed heading-level examples, grammar, and Markdown table-separator style to match Chamber 19 Markdown rules.
+- `docs/codebase/*.md` and `docs/codebase/.codebase-scan.txt` — replaced unfilled placeholders with evidence-backed content and regenerated scan output from the current repository state.
+
 ### 2026-05-14
 
 #### Added

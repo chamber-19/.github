@@ -184,7 +184,7 @@ Safety contract: never push directly to `main`. Always create a PR. Keep branch 
 
 ## Rule governance
 
-Shared rule sets live in `chamber-19/org-maintenance/biome/`:
+Shared rule sets are maintained from `chamber-19/.github` (no separate org-maintenance repo):
 
 - `biome.base.json` — org minimum standards, inherited by all repos
 - `biome.strict.json` — opt-in stricter rules for mature repos

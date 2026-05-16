@@ -1,135 +1,98 @@
 
 === DIRECTORY TREE (max depth 3, source files only) ===
 .github
-.github\copilot-instructions.md
-.github\instructions
-.github\instructions\acquire-codebase-knowledge.instructions.md
-.github\instructions\ai-ready.instructions.md
-.github\instructions\autocad-dotnet.instructions.md
-.github\instructions\biome.instructions.md
-.github\instructions\changelog.instructions.md
-.github\instructions\docx.instructions.md
-.github\instructions\learning.instructions.md
-.github\instructions\markdown.instructions.md
-.github\instructions\powershell.instructions.md
-.github\instructions\python.instructions.md
-.github\instructions\rust.instructions.md
-.github\instructions\tauri.instructions.md
-.github\instructions\vba-excel.instructions.md
-.github\ISSUE_TEMPLATE
-.github\ISSUE_TEMPLATE\general_issue_task.yml
-.github\ISSUE_TEMPLATE\toolkit_bump.yml
-.github\prompts
-.github\prompts\add-to-learning.prompt.md
-.github\prompts\consume-toolkit-bump.prompt.md
-.github\prompts\refactor-desktop-to-backend-service.prompt.md
-.github\prompts\release-bump.prompt.md
-.github\PULL_REQUEST_TEMPLATE.md
-.github\workflows
-.github\workflows\auto-pr-body-and-labels.yml
-.github\workflows\fix-biome.yml
-.github\workflows\fix-tailwind-canonical-vars.yml
-.github\workflows\lint-org-config.yml
-.github\workflows\lint-yaml.yml
-.github\workflows\propagate-skills-to-repos.yml
-.github\workflows\reconcile-family-table.yml
-.github\workflows\reusable-copilot-setup-steps.yml
+.github/ISSUE_TEMPLATE
+.github/ISSUE_TEMPLATE/general_issue_task.yml
+.github/ISSUE_TEMPLATE/toolkit_bump.yml
+.github/PULL_REQUEST_TEMPLATE.md
+.github/copilot-instructions.md
+.github/instructions
+.github/instructions/acquire-codebase-knowledge.instructions.md
+.github/instructions/ai-ready.instructions.md
+.github/instructions/autocad-dotnet.instructions.md
+.github/instructions/biome.instructions.md
+.github/instructions/changelog.instructions.md
+.github/instructions/css-discipline.instructions.md
+.github/instructions/docx.instructions.md
+.github/instructions/learning.instructions.md
+.github/instructions/markdown.instructions.md
+.github/instructions/powershell.instructions.md
+.github/instructions/python.instructions.md
+.github/instructions/rust.instructions.md
+.github/instructions/tauri.instructions.md
+.github/instructions/ui-ux-discipline.instructions.md
+.github/instructions/vba-excel.instructions.md
+.github/prompts
+.github/prompts/add-to-learning.prompt.md
+.github/prompts/consume-toolkit-bump.prompt.md
+.github/prompts/refactor-desktop-to-backend-service.prompt.md
+.github/prompts/release-bump.prompt.md
+.github/workflows
+.github/workflows/auto-pr-body-and-labels.yml
+.github/workflows/fix-biome.yml
+.github/workflows/fix-tailwind-canonical-vars.yml
+.github/workflows/lint-org-config.yml
+.github/workflows/lint-yaml.yml
+.github/workflows/propagate-skills-to-repos.yml
+.github/workflows/reconcile-family-table.yml
+.github/workflows/reusable-copilot-setup-steps.yml
 .gitmodules
 AGENTS.md
 CHANGELOG.md
-docs
-docs\codebase
-docs\codebase\.codebase-scan.txt
-docs\codebase\ARCHITECTURE.md
-docs\codebase\CONCERNS.md
-docs\codebase\CONVENTIONS.md
-docs\codebase\INTEGRATIONS.md
-docs\codebase\STACK.md
-docs\codebase\STRUCTURE.md
-docs\codebase\TESTING.md
-docs\evals
-docs\evals\autocad_transaction.yaml
-docs\evals\design_system_compliance.yaml
-docs\evals\docx_render_verify.yaml
-docs\evals\markdown_quality.yaml
-docs\evals\python_sidecar_flush.yaml
-docs\evals\rust_error_handling.yaml
-docs\evals\tauri_ipc_guard.yaml
-docs\evals\vba_stage_submit.yaml
-docs\memory.md
-docs\pilots.md
-docs\skills
-docs\skills\acquire-codebase-knowledge
-docs\skills\acquire-codebase-knowledge\assets
-docs\skills\acquire-codebase-knowledge\references
-docs\skills\acquire-codebase-knowledge\scripts
-docs\skills\acquire-codebase-knowledge\SKILL.md
-docs\skills\AI_READY.md
-docs\skills\AUTOCAD_ASSISTANT.md
-docs\skills\AUTOCAD_DOTNET.md
-docs\skills\BIOME.md
-docs\skills\CHANGELOG.md
-docs\skills\DOCX.md
-docs\skills\MARKDOWN.md
-docs\skills\POWERSHELL.md
-docs\skills\PYTHON.md
-docs\skills\RUST.MD
-docs\skills\TAURI.MD
-docs\skills\tauri2-skills
-docs\skills\tauri2-skills\.claude
-docs\skills\tauri2-skills\.github
-docs\skills\tauri2-skills\.gitignore
-docs\skills\tauri2-skills\agents
-docs\skills\tauri2-skills\CHANGELOG.md
-docs\skills\tauri2-skills\CLAUDE.md
-docs\skills\tauri2-skills\CONTRIBUTING.md
-docs\skills\tauri2-skills\DECISIONS.md
-docs\skills\tauri2-skills\docs
-docs\skills\tauri2-skills\INDEX.md
-docs\skills\tauri2-skills\LESSONS.md
-docs\skills\tauri2-skills\LICENSE
-docs\skills\tauri2-skills\package.json
-docs\skills\tauri2-skills\README.md
-docs\skills\tauri2-skills\REQUIREMENTS.md
-docs\skills\tauri2-skills\ROADMAP.md
-docs\skills\tauri2-skills\SECURITY.md
-docs\skills\tauri2-skills\skills
-docs\skills\tauri2-skills\SOURCES.md
-docs\skills\tauri2-skills\Tauri-2-Claude-Skill-Package.code-workspace
-docs\skills\tauri2-skills\WAY_OF_WORK.md
-docs\skills\threejs-skills
-docs\skills\threejs-skills\.github
-docs\skills\threejs-skills\.gitignore
-docs\skills\threejs-skills\agents
-docs\skills\threejs-skills\CHANGELOG.md
-docs\skills\threejs-skills\CLAUDE.md
-docs\skills\threejs-skills\DECISIONS.md
-docs\skills\threejs-skills\docs
-docs\skills\threejs-skills\HANDOFF.md
-docs\skills\threejs-skills\INDEX.md
-docs\skills\threejs-skills\LESSONS.md
-docs\skills\threejs-skills\LICENSE
-docs\skills\threejs-skills\OPEN-QUESTIONS.md
-docs\skills\threejs-skills\package.json
-docs\skills\threejs-skills\README.md
-docs\skills\threejs-skills\REQUIREMENTS.md
-docs\skills\threejs-skills\ROADMAP.md
-docs\skills\threejs-skills\skills
-docs\skills\threejs-skills\SOURCES.md
-docs\skills\threejs-skills\START-PROMPT.md
-docs\skills\threejs-skills\WAY_OF_WORK.md
-docs\skills\VBA_EXCEL.md
-profile
-profile\README.md
 README.md
+docs
+docs/codebase
+docs/codebase/.codebase-scan.txt
+docs/codebase/ARCHITECTURE.md
+docs/codebase/CONCERNS.md
+docs/codebase/CONVENTIONS.md
+docs/codebase/INTEGRATIONS.md
+docs/codebase/STACK.md
+docs/codebase/STRUCTURE.md
+docs/codebase/TESTING.md
+docs/evals
+docs/evals/autocad_transaction.yaml
+docs/evals/design_system_compliance.yaml
+docs/evals/docx_render_verify.yaml
+docs/evals/markdown_quality.yaml
+docs/evals/python_sidecar_flush.yaml
+docs/evals/rust_error_handling.yaml
+docs/evals/tauri_ipc_guard.yaml
+docs/evals/vba_stage_submit.yaml
+docs/memory.md
+docs/pilots.md
+docs/skills
+docs/skills/AI_READY.md
+docs/skills/AUTOCAD_ASSISTANT.md
+docs/skills/AUTOCAD_DOTNET.md
+docs/skills/BIOME.md
+docs/skills/CHANGELOG.md
+docs/skills/CSS_DISCIPLINE.md
+docs/skills/DOCX.md
+docs/skills/MARKDOWN.md
+docs/skills/POWERSHELL.md
+docs/skills/PYTHON.md
+docs/skills/RUST.MD
+docs/skills/TAURI.MD
+docs/skills/UI_UX_DISCIPLINE.md
+docs/skills/VBA_EXCEL.md
+docs/skills/acquire-codebase-knowledge
+docs/skills/acquire-codebase-knowledge/SKILL.md
+docs/skills/acquire-codebase-knowledge/assets
+docs/skills/acquire-codebase-knowledge/references
+docs/skills/acquire-codebase-knowledge/scripts
+docs/skills/tauri2-skills
+docs/skills/threejs-skills
+profile
+profile/README.md
 scripts
-scripts\family-manifest.yml
-scripts\fix-biome.sh
-scripts\fix-tailwind-canonical-vars.mjs
-scripts\foundry-pr-trigger.properties.json
-scripts\foundry-pr-trigger.yml
-scripts\lint-org-config.ps1
-scripts\reconcile-family-table.ps1
+scripts/family-manifest.yml
+scripts/fix-biome.sh
+scripts/fix-tailwind-canonical-vars.mjs
+scripts/foundry-pr-trigger.properties.json
+scripts/foundry-pr-trigger.yml
+scripts/lint-org-config.ps1
+scripts/reconcile-family-table.ps1
 
 === STACK DETECTION (manifest files) ===
 No recognized manifest files found in project root.
@@ -144,88 +107,74 @@ No linting or formatting config files found in project root.
 No .env.example or .env.template found. Identify required environment variables by searching the code and config for environment variable reads.
 
 === TODO / FIXME / HACK (production code only, test dirs excluded) ===
-docs\skills\acquire-codebase-knowledge\scripts\scan.py:28: TODO_LIMIT = 60
-docs\skills\acquire-codebase-knowledge\scripts\scan.py:291: """Search for TODO/FIXME/HACK comments."""
-docs\skills\acquire-codebase-knowledge\scripts\scan.py:291: """Search for TODO/FIXME/HACK comments."""
-docs\skills\acquire-codebase-knowledge\scripts\scan.py:291: """Search for TODO/FIXME/HACK comments."""
-docs\skills\acquire-codebase-knowledge\scripts\scan.py:293: patterns = ["TODO", "FIXME", "HACK"]
-docs\skills\acquire-codebase-knowledge\scripts\scan.py:293: patterns = ["TODO", "FIXME", "HACK"]
-docs\skills\acquire-codebase-knowledge\scripts\scan.py:293: patterns = ["TODO", "FIXME", "HACK"]
-docs\skills\acquire-codebase-knowledge\scripts\scan.py:320: return todos[:TODO_LIMIT]
-docs\skills\acquire-codebase-knowledge\scripts\scan.py:617: # TODOs
-docs\skills\acquire-codebase-knowledge\scripts\scan.py:620: print_section("TODO / FIXME / HACK (production code only, test dirs excluded)", todos, output_file)
-docs\skills\acquire-codebase-knowledge\scripts\scan.py:620: print_section("TODO / FIXME / HACK (production code only, test dirs excluded)", todos, output_file)
-docs\skills\acquire-codebase-knowledge\scripts\scan.py:620: print_section("TODO / FIXME / HACK (production code only, test dirs excluded)", todos, output_file)
-docs\skills\acquire-codebase-knowledge\scripts\scan.py:622: print_section("TODO / FIXME / HACK (production code only, test dirs excluded)", ["None found."], output_file)
-docs\skills\acquire-codebase-knowledge\scripts\scan.py:622: print_section("TODO / FIXME / HACK (production code only, test dirs excluded)", ["None found."], output_file)
-docs\skills\acquire-codebase-knowledge\scripts\scan.py:622: print_section("TODO / FIXME / HACK (production code only, test dirs excluded)", ["None found."], output_file)
+docs/skills/acquire-codebase-knowledge/scripts/scan.py:28: TODO_LIMIT = 60
+docs/skills/acquire-codebase-knowledge/scripts/scan.py:291: """Search for TODO/FIXME/HACK comments."""
+docs/skills/acquire-codebase-knowledge/scripts/scan.py:291: """Search for TODO/FIXME/HACK comments."""
+docs/skills/acquire-codebase-knowledge/scripts/scan.py:291: """Search for TODO/FIXME/HACK comments."""
+docs/skills/acquire-codebase-knowledge/scripts/scan.py:293: patterns = ["TODO", "FIXME", "HACK"]
+docs/skills/acquire-codebase-knowledge/scripts/scan.py:293: patterns = ["TODO", "FIXME", "HACK"]
+docs/skills/acquire-codebase-knowledge/scripts/scan.py:293: patterns = ["TODO", "FIXME", "HACK"]
+docs/skills/acquire-codebase-knowledge/scripts/scan.py:320: return todos[:TODO_LIMIT]
+docs/skills/acquire-codebase-knowledge/scripts/scan.py:617: # TODOs
+docs/skills/acquire-codebase-knowledge/scripts/scan.py:620: print_section("TODO / FIXME / HACK (production code only, test dirs excluded)", todos, output_file)
+docs/skills/acquire-codebase-knowledge/scripts/scan.py:620: print_section("TODO / FIXME / HACK (production code only, test dirs excluded)", todos, output_file)
+docs/skills/acquire-codebase-knowledge/scripts/scan.py:620: print_section("TODO / FIXME / HACK (production code only, test dirs excluded)", todos, output_file)
+docs/skills/acquire-codebase-knowledge/scripts/scan.py:622: print_section("TODO / FIXME / HACK (production code only, test dirs excluded)", ["None found."], output_file)
+docs/skills/acquire-codebase-knowledge/scripts/scan.py:622: print_section("TODO / FIXME / HACK (production code only, test dirs excluded)", ["None found."], output_file)
+docs/skills/acquire-codebase-knowledge/scripts/scan.py:622: print_section("TODO / FIXME / HACK (production code only, test dirs excluded)", ["None found."], output_file)
 
 === GIT RECENT COMMITS (last 20) ===
+d2717a1 feat(skills): add CSS_DISCIPLINE + UI_UX_DISCIPLINE; bundle in-flight AI_READY agent-intake updates
+2595f72 feat: add comprehensive documentation for codebase architecture, concerns, conventions, integrations, stack, structure, and testing patterns
 6398991 feat: enhance accessibility guidelines in copilot instructions and document backend distribution changes in memory
 8ca9d44 fix: resolve actionlint shellcheck failures and YAML date parsing
 03bd80c feat: overhaul skills, add new skills + instruction wrappers, new CI workflows
 0a20d09 Docs/architecture refactor (#35)
-ec2f9a2 Add reusable `copilot-setup-steps` workflow for org-wide toolchain bootstrap (#34)
-5f9ff9f fix(propagate): fix gh label create syntax and decouple labels from PR creation
-a856096 [WIP] Fix parsing of repo metadata in drift-fix PRs (#33)
-80da319 fix: remove paths filter from lint-org-config pull_request_target trigger (#32)
-9e9d58c feat: Foundry PR trigger workflow template + org-wide Copilot instruction drift fixer (#31)
-734b65c chore(skills): sync AUTOCAD_DOTNET.md from autocad-knowledge@d1dd888 (#30)
-2967e1c Merge pull request #28 from chamber-19/copilot/fix-main-broken-by-adversarial-test
-0d14712 fix(ci): restore adversarial breakages and wire PR-time lint/drift triggers
-e21ae55 Revert "Merge pull request #27 from chamber-19/copilot/test-lint-failures"
-0c95672 Initial plan
-70aead6 Merge pull request #26 from chamber-19/auto/family-table-sync-20260509
-fdbc7a2 Merge pull request #27 from chamber-19/copilot/test-lint-failures
-c349ae4 test(lint): seed adversarial breakages to validate org-config lint guardrails
-6f04ee5 Initial plan
-32f1f1c chore(family-table): reconcile from live repo metadata
-46f0bbf Merge pull request #24 from chamber-19/copilot/add-lint-workflow-script
 
 === HIGH-CHURN FILES (last 90 days, top 20) ===
-  19 .github/copilot-instructions.md
-   7 README.md
-   6 profile/README.md
-   5 scripts/reconcile-family-table.ps1
-   4 copilot-alignment-audit.md
-   4 docs/skills/AUTOCAD_DOTNET.md
-   4 scripts/family-manifest.yml
-   4 scripts/lint-org-config.ps1
+   4 .github/copilot-instructions.md
+   3 CHANGELOG.md
    3 docs/memory.md
-   3 .github/ISSUE_TEMPLATE/copilot_task.yml
-   3 .github/PULL_REQUEST_TEMPLATE.md
-   3 .github/instructions/docx.instructions.md
-   3 .github/prompts/consume-toolkit-bump.prompt.md
-   3 .github/prompts/release-bump.prompt.md
-   3 .github/scripts/audit-chamber-config.ps1
-   3 docs/skills/MARKDOWN.md
-   3 .github/workflows/propagate-skills-to-repos.yml
-   3 .github/workflows/lint-org-config.yml
-   3 .github/instructions/python.instructions.md
-   3 .github/instructions/rust.instructions.md
+   3 scripts/reconcile-family-table.ps1
+   2 docs/skills/AI_READY.md
+   2 .github/workflows/fix-biome.yml
+   2 .github/workflows/fix-tailwind-canonical-vars.yml
+   2 .github/workflows/lint-yaml.yml
+   2 .github/ISSUE_TEMPLATE/bug_report.yml
+   2 .github/ISSUE_TEMPLATE/copilot_task.yml
+   2 .github/ISSUE_TEMPLATE/general_issue_task.yml
+   2 .github/PULL_REQUEST_TEMPLATE.md
+   2 .github/instructions/docx.instructions.md
+   2 .github/instructions/markdown.instructions.md
+   2 .github/prompts/consume-toolkit-bump.prompt.md
+   2 .github/prompts/release-bump.prompt.md
+   2 .github/scripts/audit-chamber-config.ps1
+   2 README.md
+   2 copilot-alignment-audit.md
+   2 docs/pilots.md
 
 === MONOREPO SIGNALS ===
 No monorepo signals detected.
 
 === CODE METRICS ===
-Total files scanned: 341
-Total lines of code: 890
+Total files scanned: 85
+Total lines of code: 776
 
 Files by language:
-  Other: 340
+  Other: 84
   Python: 1
 
 Top 10 largest files:
-docs\skills\AUTOCAD_DOTNET.md: 148.7KB
-docs\skills\tauri2-skills\docs\research\vooronderzoek-tauri.md: 108.8KB
-docs\skills\tauri2-skills\docs\social-preview.png: 76.4KB
-docs\skills\threejs-skills\docs\social-preview.png: 75.0KB
-docs\skills\tauri2-skills\docs\masterplan\tauri-masterplan.md: 70.3KB
-docs\skills\threejs-skills\docs\masterplan\masterplan.md: 70.1KB
-docs\skills\threejs-skills\docs\research\vooronderzoek-threejs-geometry-materials.md: 56.3KB
-docs\skills\threejs-skills\docs\research\vooronderzoek-threejs-features.md: 55.8KB
-docs\skills\threejs-skills\docs\research\vooronderzoek-threejs-core.md: 50.3KB
-docs\skills\threejs-skills\docs\research\b1-research-core.md: 48.5KB
+docs/skills/AUTOCAD_DOTNET.md: 145.9KB
+CHANGELOG.md: 28.6KB
+docs/skills/MARKDOWN.md: 25.2KB
+docs/skills/acquire-codebase-knowledge/scripts/scan.py: 23.2KB
+.github/copilot-instructions.md: 23.0KB
+.github/prompts/refactor-desktop-to-backend-service.prompt.md: 17.9KB
+.github/workflows/propagate-skills-to-repos.yml: 16.9KB
+scripts/reconcile-family-table.ps1: 13.5KB
+.github/instructions/powershell.instructions.md: 12.0KB
+docs/skills/CSS_DISCIPLINE.md: 11.9KB
 
 === CI/CD PIPELINES ===
 CI/CD: GitHub Actions

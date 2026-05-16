@@ -127,10 +127,9 @@ When the user pushes back on a push-back, escalate by asking: *"This violates [r
 
 ## Build-blocking enforcement
 
-- `@chamber-19/stylelint-config` blocks CSS violations
-- `@chamber-19/biome-config` blocks JS/TS violations (including accessibility rules — `noAutofocus`, `useButtonType`, `useValidAriaProps`)
-- A toolkit-shipped `useAccessibilityAudit()` hook runs in dev mode and emits console errors on missing `id`/`name`/`alt`/`label` — consumer apps wire it in their dev build
-- CI emits `::error` annotations on the PR's Files Changed tab when any of the above fails
+- Planned enforcement packages: `@chamber-19/stylelint-config` (CSS) and `@chamber-19/biome-config` (JS/TS accessibility rules such as `noAutofocus`, `useButtonType`, `useValidAriaProps`)
+- Planned toolkit dev helper: `useAccessibilityAudit()` for missing `id`/`name`/`alt`/`label` signals during development
+- Planned CI behavior: emit `::error` annotations on the PR's Files Changed tab when these checks fail
 
 ---
 

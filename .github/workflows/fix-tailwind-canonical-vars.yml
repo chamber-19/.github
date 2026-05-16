@@ -30,6 +30,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: chamber-19/.github
+          path: org-config
 
       - name: Validate app secrets
         run: |
@@ -67,7 +71,7 @@ jobs:
 
           DEFAULT_BRANCH="$(gh repo view "$TARGET_REPO" --json defaultBranchRef -q '.defaultBranchRef.name')"
           git checkout -B "$BRANCH_NAME" "origin/$DEFAULT_BRANCH"
-          node "$GITHUB_WORKSPACE/scripts/fix-tailwind-canonical-vars.mjs" "$TARGET_DIR"
+          node "$GITHUB_WORKSPACE/org-config/scripts/fix-tailwind-canonical-vars.mjs" "$TARGET_DIR"
 
           if git diff --quiet; then
             echo "No changes for ${TARGET_REPO}"
