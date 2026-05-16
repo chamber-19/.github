@@ -90,6 +90,7 @@ jobs:
         run: npm ci
 
       - name: Run stylelint with GitHub annotations
+        id: stylelint
         working-directory: ${{ inputs.working-directory }}
         env:
           CSS_GLOB: ${{ inputs.css-glob }}
@@ -116,7 +117,7 @@ jobs:
           npx stylelint "${stylelint_args[@]}"
 
       - name: Failure footer
-        if: ${{ failure() }}
+        if: ${{ always() && steps.stylelint.outcome == 'failure' }}
         run: |
           {
             echo "## CSS Discipline failed"
@@ -125,7 +126,7 @@ jobs:
             echo "Each error annotation on the Files Changed tab includes the rule name"
             echo "and a reference to the canonical skill:"
             echo ""
-            echo "**chamber-19/.github → docs/skills/CSS_DISCIPLINE.md**"
+            echo "\`chamber-19/.github → docs/skills/CSS_DISCIPLINE.md\`"
             echo ""
             echo "Common fixes:"
             echo "- \`color-no-hex\` — replace hex with a \`--ch-*\` token, or extend via \`_theme.override.css\`"
