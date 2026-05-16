@@ -16,7 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 #### Added
 
-- `.github/workflows/reusable-css-discipline.yml` — added a reusable workflow that consumer repos invoke via `uses: chamber-19/.github/.github/workflows/reusable-css-discipline.yml@main` to run `@chamber-19/stylelint-config` against CSS/SCSS/Sass/Less files with `--max-warnings 0` and `--formatter github`, configurable `node-version`/`working-directory`/`css-glob`/`gh-packages-scope`/`allow-empty-input` inputs, and `contents: read` plus `packages: read` permissions for GitHub Packages auth.
+- `.github/workflows/reusable-css-discipline.yml` — added a reusable workflow that consumer repos invoke via `uses: chamber-19/.github/.github/workflows/reusable-css-discipline.yml@main` to run `@chamber-19/stylelint-config` with GitHub annotations and strict warning failure against CSS/SCSS/Sass/Less files.
 
 ### 2026-05-10
 
