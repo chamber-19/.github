@@ -29,6 +29,7 @@ function Get-PythonCommand {
             return $true
         }
         catch {
+            Write-Verbose "Interpreter '$Command' cannot import PyYAML: $($_.Exception.Message)"
             return $false
         }
     }
