@@ -14,6 +14,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### 2026-05-16
 
+#### Added
+
+- 12 new `acad-*` Copilot instruction wrappers under `.github/instructions/`
+  for path-scoped AutoCAD workflow discipline (block attributes, bootstrap,
+  drawing-package QA/QC, error diagnosis, install audit, layer standards,
+  python sidecar, RAG task, read-only-first, safe-write-review, skill-builder,
+  terminal-block). Each is < 3 KB, applies via `applyTo:` to AutoCAD-relevant
+  file globs, and points back to the `AUTOCAD_DOTNET.md` deep skill plus the
+  `autocad-knowledge` repo. Mirrors the `/acad-*` slash-command set and the
+  autonomous `ch19-acad-*` Skill set in personal skill folders. New
+  "AutoCAD workflow wrappers" sub-section added to the Skills registry in
+  `.github/copilot-instructions.md` to list them.
+
 #### Fixed
 
 - `.github/workflows/fix-biome.yml` — replaced `printf` with heredoc to eliminate SC2016 (backtick in single-quoted string).

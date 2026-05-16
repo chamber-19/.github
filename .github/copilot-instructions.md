@@ -276,6 +276,30 @@ relevant skill file before making changes in a given language or domain.
 | `AI_READY.md` | Making a repo AI-ready — verifying or creating `AGENTS.md`, `copilot-instructions.md`, CI workflows, issue templates |
 | `POWERSHELL.md` | Writing or reviewing PowerShell scripts — approved verbs, parameter design, error handling, GitHub API patterns, `PowerShellForGitHub` |
 
+### AutoCAD workflow wrappers
+
+These are path-scoped instruction wrappers (not full deep skills). They
+load automatically when matching files are touched and apply specific
+workflow discipline on top of the `AUTOCAD_DOTNET.md` deep skill. Each
+also has an autonomous Skill mirror at `ch19-acad-*` in
+`~/.workbuddy/skills/` and `~/.claude/skills/`, plus a slash-command
+mirror at `/acad-*` in the workspace `.claude/commands/`.
+
+| Wrapper (`.github/instructions/`) | Read when... |
+|---|---|
+| `acad-block-attributes.instructions.md` | Working with block attributes — `AttributeReference`, `BlockReference.AttributeCollection`, `ATTSYNC`, `ATTREDEF` |
+| `acad-bootstrap.instructions.md` | Starting a new AutoCAD .NET plugin project from scratch |
+| `acad-drawing-package-qaqc.instructions.md` | QA/QC on a drawing package — layer standards, block usage, xrefs, plot styles |
+| `acad-error-diagnosis.instructions.md` | Diagnosing AutoCAD plugin errors — `eLockViolation`, `NotOpenForRead`, `eIsErased`, transaction commit failures |
+| `acad-install-audit.instructions.md` | Plugin install issues — bundle layout, `ApplicationPlugins`, `PackageContents.xml`, load-on-demand |
+| `acad-layer-standards.instructions.md` | Enforcing or auditing AutoCAD layer standards in drawings |
+| `acad-python-sidecar.instructions.md` | Plugin calling out to a Python sidecar — `Process.Start`, IPC over stdio/named-pipe |
+| `acad-rag-task.instructions.md` | Querying the local RAG store under `autocad-llm-pipeline/` (Ollama + `store.db`) |
+| `acad-readonly-first.instructions.md` | **Starting any AutoCAD automation task** — enforces read → summarize → preview → confirm → write |
+| `acad-safe-write-review.instructions.md` | Before any AutoCAD write operation — preview-and-confirm gate |
+| `acad-skill-builder.instructions.md` | Creating a new `acad-*` skill or domain workflow document |
+| `acad-terminal-block.instructions.md` | Terminal-block work — `TerminalBlock` `CommandMethods`, `oneshot/Templates/TerminalBlock.dwt`, placement/labelling |
+
 ---
 
 ## AutoCAD knowledge base
